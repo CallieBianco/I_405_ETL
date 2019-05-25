@@ -49,11 +49,11 @@ class Highway:
             roadway[i, -1, 1] = 2
         #Generate Exits
         for i in exits:
-            roadway[i*self.grid_per_mile, 1, 3] = 2
+            roadway[i*self.grid_per_mile, 3, 3] = 2
             self.exits_arr.append(Exit(i/self.grid_per_mile))
         #Generate Entrances
         for i in enters:
-            roadway[i*self.grid_per_mile, 1, 3] = 1
+            roadway[i*self.grid_per_mile, 3, 3] = 1
             self.entrance_arr.append(Enter(i/self.grid_per_mile))
         return roadway
     
