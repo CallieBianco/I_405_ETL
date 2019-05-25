@@ -1,4 +1,6 @@
 from car import Car
+from highway import Highway
+import math as M
 import numpy as N
 
 EXPECTED_FREQ_COMM_AVG = 0.5
