@@ -2,7 +2,7 @@
 import numpy as N
 
 GTG_PASS_PROB = 0.5
-POP_PROBS = N.array([[0,1,2,3], [0.2, 0.3, 0.8, 1]])
+POP_PROBS = N.array([[0,1,2,3], [0.2, 0.5, 0.8, 1]])
 FREQ_COMM_PROB = 0.5
 
 # Decides if car has good to go pass.
