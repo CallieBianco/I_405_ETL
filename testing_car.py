@@ -1,3 +1,10 @@
+"""
+
+Created on Mon May 27 11:15:27 2019
+
+@author: CallieBianco
+
+"""
 from Income_Data import Income_Data
 from car import Car
 
