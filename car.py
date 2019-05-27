@@ -42,9 +42,12 @@ class Car(object):
               for carpooling (pop >= 3) cars. (free access to ETL)
     """
     def __init__(self, direction):
+        self.direction = direction
         self.inc_data = inc.Income_Data()
-        #self.on_ramp = self.init_on_ramp()
-        #self.off_ramp = self.init_off_ramp()
+        self.on_ramp = self.init_on_ramp()
+        self.off_ramp = self.init_off_ramp()
+        self.income_class = self._class_breakdown() 
+        self.city = self._city_data()
         #self.has_gtg = self.init_has_gtg()
         #self.pop = self.init_pop()
         #self.can_shift_left = self.shift_left()
@@ -53,39 +56,114 @@ class Car(object):
         self.income = self.init_income()
         #self.length = 1
         #self.freq_commuter = self.init_frequent()
-        #self.in_a_hurry = self.init_hurry()
+        self.in_a_hurry = self.init_hurry()
         #self.crashed = False
         #self.horiz = 0
         #self.vertic = 0
         #self.speed = 0 # mph
-        self.direction = direction
+    
+     def init_on_ramp(self):
+        # Hard to find data for
+        # Educated guess of percentages based on populations
+        # Found population of each city associated with an on-ramp
+        # Divided each by the total (that percentage is the chance that
+        # a car entered from that on-ramp)
+        south_pops = [110079, 38273, 21337, 45533, 45533]
+        total_s = np.sum(south_pops)
+        chances_s = np.zeros(len(south_pops))
+        for i in range(len(chances_s)):
+            chances_s[i] = south_pops[i] / total_s
+            
+        north_pops = [144444, 64291, 88630, 45533]
+        total_n = np.sum(north_pops)
+        chances_n = np.zeros(len(north_pops))
+        for i in range(len(chances_n)):
+            chances_n[i] = north_pops[i] / total_n
+            
+        on_ramps_south = ['I5 North', 'I5 South1','I5 South2', 'Canyon Park', \
+                          'WA_522']                  
+        on_ramps_north = ['Bellevue 4th St', 'Redmond Way', 'Central Way', \
+                          'WA 527']
         
+        chance = np.random.uniform()
+        if self.direction == 'South':
+            if chance < chances_s[0]:
+                return on_ramps_south[0]
+            elif chance > chances_s[0] and chance < np.sum(chances_s[0:2]):
+                return on_ramps_south[1]
+            elif chance > chances_s[1] and chance < np.sum(chances_s[0:3]):
+                return on_ramps_south[2]
+            elif chance > chances_s[2] and chance < np.sum(chances_s[0:4]):
+                return on_ramps_south[3]
+            elif chance > chances_s[3] and chance < np.sum(chances_s[0:5]):
+                return on_ramps_south[4]
+                
+        elif self.direction == 'North':
+            if chance < chances_n[0]:
+                return on_ramps_north[0]
+            elif chance > chances_n[0] and chance < np.sum(chances_n[0:2]):
+                return on_ramps_north[1]
+            elif chance > chances_n[1] and chance < np.sum(chances_n[0:3]):
+                return on_ramps_north[2]
+            elif chance > chances_n[2] and chance < np.sum(chances_n[0:4]):
+                return on_ramps_north[3]
+    
+    def init_off_ramp(self):
+        # randomly assigned off_ramps
+        # Constraint: All exits are between Lynnwood and Bothell
+        # Southbound: includes a "past Bothell" exit
+        # Northbound: includes a "before Bothell" exit
+        south_exits = ['SR 527', 'NE 195th', 'SR 522', 'NE 160th', 'NE 124th', \
+                       'Past Bothell']
+        north_exits = ['Before Bothell', 'SR 527', 'I5 North', 'I5 South', \
+                       'SR 525']
+        # Assume at least half of cars are going to go past Bothell
+        if self.direction == 'South':
+            if self.on_ramp == 'Bothell':
+                return south_exits[-1]
+            else:
+                rand = np.random.uniform()
+                if rand <= .5:
+                    return south_exits[-1]
+                else:
+                    rint = np.random.randint(0,5)
+                    return south_exits[rint]
+        # Assume at least half of cars will exit before Bothell
+        else:
+            if self.on_ramp != 'Bothell':
+                rand = np.random.uniform()
+                if rand <= .5:
+                    return north_exits[0]
+                else:
+                    rint = np.random.randint(1,5)
+                    return north_exits[rint]
+            else:
+                rint = np.random.randint(1,5)
+                return north_exits[rint]
+    
     def init_income(self):
         """ Initializes income of a car based on city-data.
-
+            
             Assumes income of car is the driver's income.
-        """ 
-        income_class = self._class_breakdown() 
-        city = self._city_data(income_class)
-        
-        if city == 'Everett':
-            return self.inc_data.ev_inc(income_class)
-        elif city == 'Lynnwood':
-            return self.inc_data.lynn_inc(income_class) 
-        elif city == 'Mountlake Terrace':
-            return self.inc_data.mlt_inc(income_class)
-        elif city == 'Bothell':
-            return self.inc_data.bot_inc(income_class)
-        elif city == 'Bellevue':
-            return self.inc_data.bell_inc(income_class)
-        elif city == 'Redmond':
-            return self.inc_data.red_inc(income_class)
-        elif city == 'Kirkland':
-            return self.inc_data.kirk_inc(income_class)
-      
+        """       
+        if self.city == 'Everett':
+            return self.inc_data.ev_inc(self.income_class)
+        elif self.city == 'Lynnwood':
+            return self.inc_data.lynn_inc(self.income_class) 
+        elif self.city == 'Mountlake Terrace':
+            return self.inc_data.mlt_inc(self.income_class)
+        elif self.city == 'Bothell':
+            return self.inc_data.bot_inc(self.income_class)
+        elif self.city == 'Bellevue':
+            return self.inc_data.bell_inc(self.income_class)
+        elif self.city == 'Redmond':
+            return self.inc_data.red_inc(self.income_class)
+        elif self.city == 'Kirkland':
+            return self.inc_data.kirk_inc(self.income_class)
+    
     def _class_breakdown(self):
         low, mid_low, mid, mid_upper, upper = 0.0, 0.0, 0.0, 0.0, 0.0
-        classes = ['low', 'mid low', 'mid', 'mid upper', 'upper']
+        classes = ['low', 'low mid', 'mid', 'upper mid', 'upper']
         breakdown = [low, mid_low, mid, mid_upper, upper]
         for i in range(len(classes)):
             breakdown[i] = self.inc_data.income_breakdown[classes[i]] / 100.0
@@ -93,7 +171,6 @@ class Car(object):
         lm = l + breakdown[1]
         m = lm + breakdown[2]
         mu = m + breakdown[3]
-        u = mu + breakdown[4] 
         
         assign = np.random.uniform()
         if assign < l:
@@ -106,13 +183,15 @@ class Car(object):
             income_class = 'upper mid'
         else:
             income_class = 'upper'
+            
         return income_class
-
-    def _city_data(self, inc_class):             
+        
+    def _city_data(self):             
         if self.direction == 'South':
             entered = self.inc_data.on_ramps_south[self.on_ramp]
         else:
             entered = self.inc_data.on_ramps_north[self.on_ramp] 
+            
         return entered       
       
     def init_frequent(self):
@@ -182,15 +261,3 @@ class Car(object):
                 return False
         else:
             return False
-
-
-
-# random testing
-
-#cars = np.empty(10, dtype=Car)
-
-#for i in range(len(cars)):
-
-#    cars[i] = Car()
-
-#    print(cars[i].income)
