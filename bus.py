@@ -8,7 +8,7 @@ Created on Wed May 22 10:08:18 2019
 import numpy as np
 
 class Bus:
-    def __init__(self, x, y, gpm):
+    def __init__(self, x, y, gpm, max_squares):
         self.length = 3
         self.route = np.zeros(3)
         self.near_exit = False
@@ -18,6 +18,7 @@ class Bus:
         self.grids_per_mile = gpm
         self.near_exit_condition = 0.5 * gpm #half mile
         self.range_checker = np.zeros((1, 3), dtype='f')
+        self.max = max_squares
         
     def move(self, arr):
         """
@@ -52,7 +53,7 @@ class Bus:
             
     def _move_forward(self, arr):
         squares_moved = 0
-        while arr[self.coord_y:self.coord_y + 3, self.coord_x, 0] == self.range_checker:
+        while arr[self.coord_y:self.coord_y + 3, self.coord_x, 0] == self.range_checker and squares_moved < self.max:
             arr[self.coord_y - 1, self.coord_x, 0] == False
             arr[self.coord_y + 2, self.coord_x, 0] == True
             squares_moved += 1
@@ -66,11 +67,15 @@ class Bus:
             arr[self.coord_y - 1 + i, self.coord_x - 1, 0] == True
         self.coord_x -= 1
         
+        return 1, arr
+        
     def _shift_right(self, arr):
         for i in range(3): 
             arr[self.coord_y - 1 + i, self.coord_x, 0] == False
             arr[self.coord_y - 1 + i, self.coord_x + 1, 0] == True
         self.coord_x += 1
+        
+        return 1, arr
         
     def _near_exit(self, arr):
         for i in range(len(arr.exits_arr)):
