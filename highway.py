@@ -70,6 +70,8 @@ class Highway:
         lane is the index of the lane (from left to right) that the speed is being determined for
         grid_moved is the aggregate number of squares moved by vehicles in lane
         time is the timestep used in the driver program (fractions of an hour)
+        
+        vehiucles must report lane number and number of squares moved
         """
         num_vehicles = 0
         for i in range(self.length*self.grid_per_mile):
