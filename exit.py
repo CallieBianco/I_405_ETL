@@ -6,7 +6,8 @@ Created on Wed May 22 10:08:55 2019
 """
 
 class Exit:
-    def __init__(self, number, max_capacity=25):    
+    def __init__(self, number, max_capacity=25, exit_name):    
+        self.exit_name = exit_name
         self.max = max_capacity
         self.count = 0
         self.number_dispensed = 0
