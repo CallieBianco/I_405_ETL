@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 """
 Created on Wed May 22 10:09:08 2019
@@ -112,3 +113,12 @@ class SimulationDriver:
                         cars[i].append(car.Car(direction))
         return cars
 
+=======
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 22 10:09:08 2019
+
+@author: awsir
+"""
+
+>>>>>>> 41a67cf653dcfd4ea7133c9703a03af420e8034a
