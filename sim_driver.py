@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 """
 Created on Wed May 22 10:09:08 2019
@@ -53,10 +52,10 @@ class SimulationDriver:
                                             self.peakHrs_north, self.shoulder_north, self.minPrice,
                                             self.maxPrice, self.exits_north, self.start_shoulder,
                                             self.end_shoulder, self.end_tolling, self.end_tolling))
-        # Generate exits on I405 South
+        # Generate exits and entrances on I405 South
         highWay[0]._generate_road(self.exits_south)
-        # Generate exits on I405 North
-        highWay[1]._generate_road(self.exits_south)
+        # Generate exits and entrances on I405 North
+        highWay[1]._generate_road(self.exits_north)
         return highWay
     def initCars(self, direction):
         cars = []
@@ -113,12 +112,3 @@ class SimulationDriver:
                         cars[i].append(car.Car(direction))
         return cars
 
-=======
-# -*- coding: utf-8 -*-
-"""
-Created on Wed May 22 10:09:08 2019
-
-@author: awsir
-"""
-
->>>>>>> 41a67cf653dcfd4ea7133c9703a03af420e8034a
