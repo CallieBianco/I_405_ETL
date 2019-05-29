@@ -49,15 +49,6 @@ def set_freq_commuter():
     else:
         return False
 
-def move_to_etl():
-    pass
-
-def go_to_exit():
-    pass
-
-def move_on_etl():
-    pass
-
 def can_shift_left():
     # Check if general purpose lane to left
     if LANE_TYPE_GRID[vertic, horiz - 1] != 0:
@@ -131,10 +122,35 @@ def move_on_gpl():
     else:
         shift_left()
         move_forward(max_left)
+
+def move_on_etl():
+    max_forward = get_max_forward()
+    move_forward(max_forward)
+
+def go_to_exit():
+    while can_shift_right():
+        shift_right()
+    space_until_exit = EXIT_COORD[0] - vertic
+    max_forward = get_max_forward()
+    min_move = space_until_exit if space_until_exit < max_forward else \
+            max_forward
+    move_forward(min_move)
+
+def move_to_etl():
+    while can_shift_left():
+        shift_left()
+    space_until_entrance = ETL_ENTRY_COORD[0] - vertic
+    max_forward = get_max_forward()
+    min_move = space_until_entrance if space_until_entrance < max_forward \
+            else max_forward
+    move_forward(min_move)
+    if vertic == ETL_ENTRY_COORD[0]:
+        shift_left()
+    
         
 
 def is_near_exit():
-    if EXIT_COORD[1] - vertic <= NEAR_EXIT_LENGTH:
+    if EXIT_COORD[0] - vertic <= NEAR_EXIT_LENGTH:
         return True
     return False
 
