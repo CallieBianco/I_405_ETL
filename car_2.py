@@ -10,6 +10,7 @@ FREQ_COMM_PROB = 0.5
 # For car move functions
 VEH_LOCS_GRID = None # Placeholder
 LANE_TYPE_GRID = None # Placeholder
+HIGHWAY = None
 ON_ETL = False
 GOING_TO_ETL = True
 ETL_ENTRY_COORD = (2,2) # (vertic, horiz). Placeholder
@@ -18,6 +19,7 @@ NEAR_EXIT_LENGTH = 7 # Note: This is a placeholder.
 MAX_FORWARD_MOVES = 7 # Placeholder
 vertic = 0
 horiz = 0
+off_ramp = "Bothell" # Placeholder
 
 
 # Decides if car has good to go pass.
@@ -127,6 +129,12 @@ def move_on_etl():
     max_forward = get_max_forward()
     move_forward(max_forward)
 
+def remove_car():
+    exit_dict = HIGHWAY.string_to_int
+    exit_idx = exit_dict[off_ramp]
+    exit_ramp = HIGHWAY.exits_arr[exit_idx]
+    exit_ramp.intake(self)
+
 def go_to_exit():
     while can_shift_right():
         shift_right()
@@ -135,6 +143,8 @@ def go_to_exit():
     min_move = space_until_exit if space_until_exit < max_forward else \
             max_forward
     move_forward(min_move)
+    if vertic == EXIT_COORD[0] and horiz == EXIT_COORD[1]:
+        remove_car()
 
 def move_to_etl():
     while can_shift_left():
@@ -146,6 +156,8 @@ def move_to_etl():
     move_forward(min_move)
     if vertic == ETL_ENTRY_COORD[0]:
         shift_left()
+        ON_ETL = True
+        GOING_TO_ETL = False
     
         
 
