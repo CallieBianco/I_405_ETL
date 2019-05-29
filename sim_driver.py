@@ -52,10 +52,10 @@ class SimulationDriver:
                                             self.peakHrs_north, self.shoulder_north, self.minPrice,
                                             self.maxPrice, self.exits_north, self.start_shoulder,
                                             self.end_shoulder, self.end_tolling, self.end_tolling))
-        # Generate exits on I405 South
+        # Generate exits and entrances on I405 South
         highWay[0]._generate_road(self.exits_south)
-        # Generate exits on I405 North
-        highWay[1]._generate_road(self.exits_south)
+        # Generate exits and entrances on I405 North
+        highWay[1]._generate_road(self.exits_north)
         return highWay
     def initCars(self, direction):
         cars = []
