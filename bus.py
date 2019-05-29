@@ -25,7 +25,7 @@ class Bus:
         """
         Pass in the whole highway
         """
-        self.exit = _gen_exit(arr)
+        self.exit = self._gen_exit(arr)
         exited = False
         total_moved = 0
         if self.near_exit == False:
