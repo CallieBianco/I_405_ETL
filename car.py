@@ -193,45 +193,6 @@ class Car(object):
             entered = self.inc_data.on_ramps_north[self.on_ramp] 
             
         return entered       
-      
-    def init_frequent(self):
-        """ Initializes whether or not a car is a frequent commuter based on
-            commuter data.
-        """
-        # function plan:
-        # determine the percentage of frequent commuters on I-405
-        # generate a random number
-        # if random number < percentage of freq commuters: False
-        # else: True
-        # temporary return: True
-        return True
-      
-    def shift_left(self, location):
-        """ Checks spot horizontally left of car's current location
-        
-            If spot is open (True), self.can_shift_left = True
-
-        """
-        if self.horiz - 1 == True:
-            return True
-        else:
-            return False
-          
-    def shift_right(self, location):
-        """ Checks spot horizontally right of car's current location
-        
-            If spot is open (True), self.can_shift_right= True
-        """
-        if self.horiz + 1 == True:
-            return True
-        else:
-            return False
-          
-    def enter(self):
-        # assuming that entry point is at (0,0)
-        self.speed = 60
-        self.horiz = 0
-        self.vertic = 0
         
     def init_hurry(self):
         """ Determines chance of driver being in a hurry
@@ -261,3 +222,34 @@ class Car(object):
                 return False
         else:
             return False
+        
+   def want_to_move_to_ETL(self):
+        """ Function not finished, plan is laid out below
+        
+            Note: All percent chances are not final and are just examples
+        """
+        #Algorithm Data:
+        #Income
+        # Evaluate income as a proportion to the current Express Toll Lane toll
+        #   Different percentages will be put in to different brackets:
+        #   each bracket will add an increasing chance to move to ETL
+        #Time of day
+        # If it is peak you are more likely (5am-9am SB 3pm-7pm NB)
+        #Frequent commuter
+        # Frequent commuters will have a more likely chance to move to ETL
+        # during peak hours
+        #How many people they are travelling with
+        # If they have #+ and a Good-To-Good pass, 100% chance to move to ETL
+        #If they have a good-to-go pass
+        # Some percent more likely to merge depending on price because of the
+        #   $2 increase in toll without GTG pass
+        #Urgency 
+        # If they are urgent, adds some chance to merge
+        #If there was a crash
+        # Influences speed of GPL
+        #Speed of general purpose lanes (GPL) vs ETL
+        # As ETL's move certain percentages faster than the GPL's, car's will be
+        # more likely to move to ETL at a similar rate
+        
+            
+        
