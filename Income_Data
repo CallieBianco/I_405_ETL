@@ -2,7 +2,8 @@
 # https://www.pewresearch.org/fact-tank/2018/09/06/
 #       are-you-in-the-american-middle-class/
 # income and city data based on 2016 data
-
+""" @author Callie Bianco
+"""
 import numpy as np
 
 class Income_Data(object):
