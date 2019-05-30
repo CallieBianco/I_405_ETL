@@ -54,7 +54,7 @@ for m in range(min_price):
                     total_moved_per_step[vehicle_list[i].x-1] += grids_squares_moved
                     if exited == True:
                         vehicle_list.remove(i)
-                        shift++
+                        shift += 1
                 for i in range(len(north_highway.exits_arr)):
                     north_highway.exits_arr.deplete()
                     
@@ -73,7 +73,7 @@ for m in range(min_price):
                     grids_squares_moved, south_highway, exited = vehicle_list[i].move(south_highway)
                     if exited == True:
                         vehicle_list.remove(i)
-                        shift++
+                        shift += 1
                 for i in range(len(north_highway.exits_arr)):
                     north_highway.exits_arr.deplete()        
     
