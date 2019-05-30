@@ -75,7 +75,7 @@ def expected_proportion_use():
     north_proportion = (np.sum(north_etl)) / (np.sum(north_totals))
     return (south_proportion + north_proportion) / 2   
 
-def find_best_prop():
+def find_best_weight():
     """ Work in progress.
     """
     # order:
@@ -86,33 +86,27 @@ def find_best_prop():
     # hurry_score and speed_score are the next highest (can be flipped or tied)
     # gtg_score
     # time_score, commuter_score, and gtg_score will be at least 2 lower than inc
-    ins = 3
-    ts = 1
-    cs = 1
-    gs = 1
-    hs = 3
-    ss = 3
-    weight = np.array([ins, ts, cs, gs, hs, ss])
-    good = False
-    good_weights = []
-    while(good == False):
-        score = price_elasticity_weights(weight, .02)
-        if score == -1:
-            good_weights.append(weight)
-            good = True
-        elif score == 0 and ins <= 10:
-            weight += 1
-    good = False
-    if len(good_weights) == 1:
-        while(good == False):
-            score = price_elasticity_weights(good_weights[0], .01)
-            if score == -1:
-                good_weights.append(weight)
-                good = True
-            elif 0 < score < 7 and ins <= 10:
-                weight += 1
-            elif score == 0 and ins <= 10:
-                ins += 1
-                hs += 1
-                ss += 1
+    ins = np.random.randint(7, 10, 100)
+    ts = np.random.randint(2, 5, 100)
+    cs = np.random.randint(2, 5, 100) 
+    gs = np.random.randint(2, 5, 100)
+    hs = np.random.randint(5, 10, 100)
+    ss = np.random.randint(5, 10, 100)
+    weights = np.zeros(len(ins))
+    for i in range(len(ins)):
+        weight = np.array([ins[i], ts[i], cs[i], gs[i], hs[i], ss[i]])
+        diff = price_elasticity_weights(weight)
+        weights[i] = diff
+    min_i = np.argmin(weights)
+    print(price_elasticity_weights([ins[min_i], ts[min_i], cs[min_i], \
+           gs[min_i], hs[min_i], ss[min_i]]))
+    return [ins[min_i], ts[min_i], cs[min_i], gs[min_i], hs[min_i], ss[min_i]]
+
+best_weight = find_best_prop()
+if best_weight[-1] > best_weight[0]:
+    temp = best_weight[-1]
+    best_weight[-1] = best_weight[0]
+    best_weight[0] = temp
+print(best_weight)
+    
     
