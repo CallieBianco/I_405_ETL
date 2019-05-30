@@ -21,6 +21,7 @@ class Highway:
         self.num_norm_lns = num_norm_lns
         self.num_etl_lns = num_etl
         self.length = length
+        self.width = num_norm_lns + num_etl
         self.is_peak = numpy.array(peak_arr)
         self.is_shoulder = numpy.array(shoulder_arr)
         self.min_toll = min_toll
