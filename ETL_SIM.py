@@ -42,6 +42,7 @@ for m in range(min_price):
             s_vehcile_list
             #North Highway
             for t in range(time_range):
+                graph_color_gradient(north_highway, t, m, n, 'north')
                 total_moved_per_step = numpy.zeros((north_highway.width))
                 while bool(random.getrandbits(1)):
                     if random.randint(0, 1000000) / 1000000.0 <= percent_bus:
@@ -63,7 +64,8 @@ for m in range(min_price):
                     
                     
             #South Highway
-            for t in range(time_range):           
+            for t in range(time_range):          
+                graph_color_gradient(south_highway, t, m, n, 'south')
                 while bool(random.getrandbits(1)):
                     if random.randint(0, 1000000) / 1000000.0 <= percent_bus:
                         enter_number = random.randint(0, len(south_highway.entrance_arr))
