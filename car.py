@@ -5,7 +5,7 @@
 Created on Wed May 22 10:08:13 2019
 
 @author: CallieBianco
-@author: aidiriye
+
 """
 
 # to be combined with Abdullahi's code for Car.py
@@ -60,7 +60,6 @@ class Car(object):
         self.exit_coord = [0,0]
         self.horiz = 3
         self.vertic = 1
-        self.neat_exit_length = near_exit_length
         self.near_etl_length = near_etl_length
         self.highway = highway
         self.max_forward_moves = max_forward_moves
@@ -375,7 +374,7 @@ class Car(object):
             want_to_move = False
         return want_to_move
         
-     def remove_old_loc(self, veh_locs_grid, ver, hor):
+    def remove_old_loc(self, veh_locs_grid, ver, hor):
         veh_locs_grid[ver, hor] = 0
         veh_locs_grid[ver - 1, hor] = 0
 
@@ -452,7 +451,7 @@ class Car(object):
         max_left = 0
         max_right = 0
         max_forward = 0
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         if self.can_shift_left(veh_locs_grid, lane_type_grid):
             max_left = self.get_max_left(veh_locs_grid, grid_length)
         if self.can_shift_right(veh_locs_grid, lane_type_grid):
@@ -470,7 +469,7 @@ class Car(object):
     return num_moves
     
     def move_on_etl(self, veh_locs_grid):
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         return self.move_forward(max_forward, veh_locs_grid)
     
@@ -485,12 +484,17 @@ class Car(object):
         while self.can_shift_right(veh_locs_grid, lane_type_grid):
             self.shift_right(veh_locs_grid)
         space_until_exit = self.exit_coord[0] - self.vertic
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         min_move = space_until_exit if space_until_exit < max_forward else \
                 max_forward
+<<<<<<< HEAD
         num_moves = self.move_forward(min_move, veh_locs_grid)
         on_exit = False
+=======
+                
+        self.move_forward(min_move, veh_locs_grid)
+>>>>>>> f8e33dbe50c1c5e16136cd69397182d50462a13d
         if self.vertic == self.exit_coord[0] and \
                 self.horiz == self.exit_coord[1]:
                 on_exit = True
@@ -500,7 +504,7 @@ class Car(object):
         while self.can_shift_left(veh_locs_grid, lane_type_grid):
             self.shift_left(veh_locs_grid)
         space_until_entrance = self.etl_entry_coord[0] - self.vertic
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         min_move = space_until_entrance if space_until_entrance < max_forward \
                 else max_forward
@@ -529,6 +533,7 @@ class Car(object):
             return True
         return False
     
+<<<<<<< HEAD
     def move(self, highway):
         highway_grid = highway.grid
         veh_locs_grid = highway_grid[:,:,0]
@@ -537,6 +542,13 @@ class Car(object):
         on_exit = False
         if not self.on_etl and self.is_near_etl() and self.want_to_move_to_ETL():
             num_moves = self.move_to_etl(veh_locs_grid, lane_type_grid)
+=======
+    def move(self, highway_grid):
+        veh_locs_grid = highway_grid.grid[:,:,0]
+        lane_type_grid = highway_grid.grid[:,:,1]
+        if self.is_near_etl() and self.want_to_move_to_ETL():
+            self.move_to_etl(veh_locs_grid, lane_type_grid)
+>>>>>>> f8e33dbe50c1c5e16136cd69397182d50462a13d
         else:
             if self.is_near_exit():
                arr = self.go_to_exit(veh_locs_grid, lane_type_grid)
