@@ -4,8 +4,10 @@ import numpy as N
 # For setters
 # Note: The following values are place holders
 GTG_PASS_PROB = 0.5
-POP_PROBS = N.array([[0,1,2,3], [0.2, 0.5, 0.8, 1]])
-FREQ_COMM_PROB = 0.5
+# https://cleantechnica.com/2016/10/14/common-mode-transportation
+#-work-us-driving-alone-private-vehicle-us-census-data-reveals/
+POP_PROBS = N.array([[1,2,3,4,5], [0.764, 0.884, 0.944, 0.974, 1]])
+FREQ_COMM_PROB = 0.9
 
 # For car move functions
 VEH_LOCS_GRID = None # Placeholder
@@ -16,6 +18,7 @@ GOING_TO_ETL = True
 ETL_ENTRY_COORD = (2,2) # (vertic, horiz). Placeholder
 EXIT_COORD = (3,7) # (vertic, horiz). Placeholder
 NEAR_EXIT_LENGTH = 7 # Note: This is a placeholder.
+NEAR_ETL_LENGTH = 7
 MAX_FORWARD_MOVES = 7 # Placeholder
 vertic = 0
 horiz = 0
@@ -50,6 +53,14 @@ def set_freq_commuter():
         return True
     else:
         return False
+
+def remove_old_loc(ver, hor):
+    VEH_LOCS_GRID[ver, hor] = 0
+    VEH_LOCS_GRID[ver - 1, hor] = 0
+
+def add_new_loc(ver, hor):
+    VEH_LOCS_GRID[ver, hor] = 1
+    VEH_LOCS_GRID[ver - 1, hor] = 1
 
 def can_shift_left():
     # Check if general purpose lane to left
@@ -97,15 +108,23 @@ def get_max_forward():
     return max_moves
 
 def shift_left():
+    remove_old_loc(vertic, horiz)
     horiz -= 1
+    add_new_loc(vertic, horiz)
+    
 
 def shift_right():
+    remove_old_loc(vertic, horiz)
     horiz += 1
+    add_new_loc(vertic, horiz)
 
 def move_forward(space_avail):
     moves = space_avail if space_avail < MAX_FORWARD_MOVES else \
             MAX_FORWARD_MOVES
+    temp_vertic = vertic
     vertic += moves
+    remove_old_loc(temp_vertic, horiz)
+    add_new_loc(vertic, horiz)
     
 def move_on_gpl():
     max_left = 0
@@ -166,9 +185,17 @@ def is_near_exit():
         return True
     return False
 
+def is_near_etl():
+    if ETL_ENTRY_COORD[0] - vertic <= NEAR_ETL_LENGTH:
+        return True
+    return False
+
 def move():
     if GOING_TO_ETL:
-        move_to_etl()     
+        if is_near_etl():
+            move_to_etl()
+        else:
+            move_on_gpl()     
     else:
         if is_near_exit():
             go_to_exit()
@@ -177,4 +204,8 @@ def move():
                 move_on_etl()
             else:
                 move_on_gpl()
+
+# The following are just tests
+# Test if the flow works
+# Test if each function works
         
