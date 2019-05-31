@@ -56,6 +56,8 @@ class Highway:
         for i in range(numpy.shape(roadway)[0]):            
             roadway[i, 0, 1] = 2
             roadway[i, -1, 1] = 2
+            for j in range(self.num_etl_lns):
+                roadway[i, j + 1, 1] = 1
         #Generate Exits and Entrances (Paired Sets)
         for i in exits:
             roadway[math.floor(i*self.grid_per_mile - (0.1 * self.grid_per_mile)), 3, 3] = 2
