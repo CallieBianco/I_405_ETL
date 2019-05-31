@@ -171,12 +171,11 @@ class Car2:
                 self.go_to_exit(veh_locs_grid, lane_type_grid)
             else:
                 if self.on_etl:
-                    self.move_on_etl()
+                    self.move_on_etl(veh_locs_grid)
                 else:
                     self.move_on_gpl(veh_locs_grid, lane_type_grid)
 
 def animate(grid_steps):
-    print(grid_steps)
     # create the figure
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -234,9 +233,24 @@ if __name__ == "__main__":
         print("passed test 5")
     
     # Checking GPL travel and exiting
+    #car.add_new_loc(grids[:,:,0], 1, 3)
+    #car.add_new_loc(grids[:,:,0], 3, 3)
+    #car.add_new_loc(grids[:,:,0], 3, 2)
+    #grid_steps = []
+    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
+    #car.move(grids)
+    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
+    #car.move(grids)
+    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
+    #car.move(grids)
+    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
+    #animate(grid_steps)
+    
+    # ETL testing
     car.add_new_loc(grids[:,:,0], 1, 3)
-    car.add_new_loc(grids[:,:,0], 3, 3)
-    car.add_new_loc(grids[:,:,0], 3, 2)
+    car.going_to_etl = True
+    car.etl_entry_coord[0] = 6
+    car.etl_entry_coord[1] = 1
     grid_steps = []
     grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
     car.move(grids)
@@ -246,9 +260,6 @@ if __name__ == "__main__":
     car.move(grids)
     grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
     animate(grid_steps)
-    
-    
-    
     
     
     
