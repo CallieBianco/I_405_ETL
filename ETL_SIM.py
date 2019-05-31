@@ -11,6 +11,7 @@ from car import Car
 from bus import Bus
 import random
 import file_saver
+import numpy
 
 min_price = 1000
 max_price = 1000
@@ -39,10 +40,10 @@ for m in range(min_price):
             north_highway = Highway(length_highway)
             south_highway = Highway(length_highway, min_toll=m, max_toll=n)
             n_vehicle_list = []
-            s_vehcile_list
+            s_vehicle_list = []
             #North Highway
             for t in range(time_range):
-                graph_color_gradient(north_highway, t, m, n, 'north')
+                file_saver.graph_color_gradient(north_highway, t, m, n, 'north')
                 total_moved_per_step = numpy.zeros((north_highway.width))
                 while bool(random.getrandbits(1)):
                     if random.randint(0, 1000000) / 1000000.0 <= percent_bus:
@@ -54,7 +55,7 @@ for m in range(min_price):
                 for i in range(len(n_vehicle_list)):
                     i -= shift
                     grids_squares_moved, north_highway, exited = n_vehicle_list[i].move(north_highway)
-                    total_moved_per_step[vehicle_list[i].x-1] += grids_squares_moved
+                    total_moved_per_step[n_vehicle_list[i].x-1] += grids_squares_moved
                     if exited == True:
                         north_highway.exits[(n_vehicle_list[i].exit)].intake(n_vehicle_list[i])                       
                         n_vehicle_list.remove(i)
@@ -65,7 +66,7 @@ for m in range(min_price):
                     
             #South Highway
             for t in range(time_range):          
-                graph_color_gradient(south_highway, t, m, n, 'south')
+                file_saver.graph_color_gradient(south_highway, t, m, n, 'south')
                 while bool(random.getrandbits(1)):
                     if random.randint(0, 1000000) / 1000000.0 <= percent_bus:
                         enter_number = random.randint(0, len(south_highway.entrance_arr))
@@ -73,7 +74,7 @@ for m in range(min_price):
                     else:
                         s_vehicle_list.append(Car())
                 shift = 0
-                for i in range(len(vehicle_list)):
+                for i in range(len(s_vehicle_list)):
                     i -= shift
                     grids_squares_moved, south_highway, exited = s_vehicle_list[i].move(south_highway)
                     if exited == True:                        
