@@ -474,13 +474,6 @@ class Car(object):
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         return self.move_forward(max_forward, veh_locs_grid)
     
-    def remove_car(self):
-        print("Car removed")
-        #exit_dict = self.highway.string_to_int
-        #exit_idx = exit_dict[self.off_ramp]
-        #exit_ramp = self.highway.exits_arr[exit_idx]
-        #exit_ramp.intake(self)
-    
     def go_to_exit(self, veh_locs_grid, lane_type_grid):
         while self.can_shift_right(veh_locs_grid, lane_type_grid):
             self.shift_right(veh_locs_grid)
