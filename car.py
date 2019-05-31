@@ -8,6 +8,7 @@ Created on Wed May 22 10:08:13 2019
 
 """
 
+# to be combined with Abdullahi's code for Car.py
 import numpy as np
 import Income_Data as inc
 
@@ -40,7 +41,8 @@ class Car(object):
               for carpooling (pop >= 3) cars. (free access to ETL)
     """
     
-    def __init__(self, direction):
+    def __init__(self, direction, near_etl_length, near_exit_length, highway, \
+                 max_forward_moves):
         self.direction = direction
         self.inc_data = inc.Income_Data()
         self.on_ramp = self.init_on_ramp()
@@ -50,16 +52,16 @@ class Car(object):
         self.income = self.init_income()
         self.has_gtg = self.init_has_gtg()
         self.pop = self.init_pop()
-        #self.can_shift_left = self.shift_left()
-        #self.can_move_forward = False
-        #self.can_shift_right = self.shift_right()
-        #self.length = 1
         self.freq_commuter = self.init_freq_commuter()
         self.in_a_hurry = self.init_hurry()
-        #self.crashed = False
-        #self.horiz = 0
-        #self.vertic = 0
-        #self.speed = 0 # mph
+        self.going_to_etl = False
+        self.on_etl = False
+        self.etl_entry_coord = [0,0] # (vertic, horiz)
+        self.horiz = 3
+        self.vertic = 1
+        self.near_etl_length = near_etl_length
+        self.highway = highway
+        self.max_forward_moves = max_forward_moves
     
     def init_on_ramp(self):
         # Hard to find data for
@@ -371,6 +373,183 @@ class Car(object):
             want_to_move = False
         return want_to_move
         
-            
+     def remove_old_loc(self, veh_locs_grid, ver, hor):
+        veh_locs_grid[ver, hor] = 0
+        veh_locs_grid[ver - 1, hor] = 0
+
+    def add_new_loc(self, veh_locs_grid, ver, hor):
+        veh_locs_grid[ver, hor] = 1
+        veh_locs_grid[ver - 1, hor] = 1
+    
+    def can_shift_left(self, veh_locs_grid, lane_type_grid):
+        # Check if general purpose lane to left
+        if lane_type_grid[self.vertic, self.horiz - 1] != 0:
+            return False
+        if veh_locs_grid[self.vertic, self.horiz - 1] == 0 and \
+                veh_locs_grid[self.vertic - 1, self.horiz - 1] == 0:
+            return True
+        else:
+            return False
+    
+    def can_shift_right(self, veh_locs_grid, lane_type_grid):
+        # Check if general purpose lane to right
+        if lane_type_grid[self.vertic, self.horiz + 1] != 0:
+            return False
+        if veh_locs_grid[self.vertic, self.horiz + 1] == 0 and \
+                veh_locs_grid[self.vertic - 1, self.horiz + 1] == 0:
+            return True
+        else:
+            return False
+    
+    # Note: Do all cars take an exit located on the grid?
+    def get_max_left(self, veh_locs_grid, grid_length):
+        max_moves = 0
+        idx = self.vertic + 1
+        while idx < grid_length and veh_locs_grid[idx, self.horiz - 1] == 0:
+            max_moves += 1
+            idx += 1
+        return max_moves
+    
+    def get_max_right(self, veh_locs_grid, grid_length):
+        max_moves = 0
+        idx = self.vertic + 1
+        while idx < grid_length and veh_locs_grid[idx, self.horiz + 1] == 0:
+            max_moves += 1
+            idx += 1
+        return max_moves
+    
+    def get_max_forward(self, veh_locs_grid, grid_length):
+        max_moves = 0
+        idx = self.vertic + 1
+        while idx < grid_length and veh_locs_grid[idx, self.horiz] == 0:
+            max_moves += 1
+            idx += 1
+        return max_moves
+    
+    def shift_left(self, veh_locs_grid):
+        self.remove_old_loc(veh_locs_grid, self.vertic, self.horiz)
+        self.horiz -= 1
+        self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
         
+    
+    def shift_right(self, veh_locs_grid):
+        self.remove_old_loc(veh_locs_grid, self.vertic, self.horiz)
+        self.horiz += 1
+        self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
+    
+    def move_forward(self, space_avail, veh_locs_grid):
+        moves = space_avail if space_avail < self.max_forward_moves else \
+                self.max_forward_moves
+        temp_vertic = self.vertic
+        self.vertic += moves
+        self.remove_old_loc(veh_locs_grid, temp_vertic, self.horiz)
+        self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
+        
+    def move_on_gpl(self, veh_locs_grid, lane_type_grid):
+        max_left = 0
+        max_right = 0
+        max_forward = 0
+        grid_length = N.size(veh_locs_grid[:, 0])
+        if self.can_shift_left(veh_locs_grid, lane_type_grid):
+            max_left = self.get_max_left(veh_locs_grid, grid_length)
+        if self.can_shift_right(veh_locs_grid, lane_type_grid):
+            max_right = self.get_max_right(veh_locs_grid, grid_length)
+        max_forward = self.get_max_forward(veh_locs_grid, grid_length)
+        if max_forward >= max_right and max_forward >= max_left:
+            self.move_forward(max_forward, veh_locs_grid)
+        elif max_right >= max_left:
+            self.shift_right(veh_locs_grid)
+            self.move_forward(max_right, veh_locs_grid)
+        else:
+            self.shift_left(veh_locs_grid)
+            self.move_forward(max_left, veh_locs_grid)
+    
+    def move_on_etl(self, veh_locs_grid):
+        grid_length = N.size(veh_locs_grid[:, 0])
+        max_forward = self.get_max_forward(veh_locs_grid, grid_length)
+        self.move_forward(max_forward, veh_locs_grid)
+    
+    def remove_car(self):
+        print("Car removed")
+        #exit_dict = self.highway.string_to_int
+        #exit_idx = exit_dict[self.off_ramp]
+        #exit_ramp = self.highway.exits_arr[exit_idx]
+        #exit_ramp.intake(self)
+    
+    def go_to_exit(self, veh_locs_grid, lane_type_grid):
+        while self.can_shift_right(veh_locs_grid, lane_type_grid):
+            self.shift_right(veh_locs_grid)
+        space_until_exit = self.exit_coord[0] - self.vertic
+        grid_length = N.size(veh_locs_grid[:, 0])
+        max_forward = self.get_max_forward(veh_locs_grid, grid_length)
+        min_move = space_until_exit if space_until_exit < max_forward else \
+                max_forward
+                
+    self.move_forward(min_move, veh_locs_grid)
+        if self.vertic == self.exit_coord[0] and \
+                self.horiz == self.exit_coord[1]:
+            self.remove_car()
+    
+    def move_to_etl(self, veh_locs_grid, lane_type_grid):
+        while self.can_shift_left(veh_locs_grid, lane_type_grid):
+            self.shift_left(veh_locs_grid)
+        space_until_entrance = self.etl_entry_coord[0] - self.vertic
+        grid_length = N.size(veh_locs_grid[:, 0])
+        max_forward = self.get_max_forward(veh_locs_grid, grid_length)
+        min_move = space_until_entrance if space_until_entrance < max_forward \
+                else max_forward
+        self.move_forward(min_move, veh_locs_grid)
+        if self.vertic == self.etl_entry_coord[0]:
+            self.shift_left(veh_locs_grid)
+            self.on_etl = True
+            self.going_to_etl = False
+        
+    def is_near_exit(self):
+        if self.exit_coord[0] - self.vertic <= self.near_exit_length:
+            return True
+        return False
+    
+    def update_nearest_etl(self):
+        entry_arr = self.highway.etl_entry_arr
+        for i in range(len(entry_arr)):
+            if self.vertic <= entry_arr[i][0]:
+                self.etl_entry_coord[0] = entry_arr[i][0]
+                self.etl_entry_coord[1] = entry_arr[i][1]
+    
+    def is_near_etl(self):
+        self.update_nearest_etl()
+        if self.etl_entry_coord[0] - self.vertic <= self.near_etl_length:
+            return True
+        return False
+    
+    def move(self, highway_grid):
+        veh_locs_grid = highway_grid[:,:,0]
+        lane_type_grid = highway_grid[:,:,1]
+        if self.is_near_etl() and self.want_to_move_to_ETL():
+            self.move_to_etl(veh_locs_grid, lane_type_grid)
+        else:
+            if self.is_near_exit():
+                self.go_to_exit(veh_locs_grid, lane_type_grid)
+            else:
+                if self.on_etl:
+                    self.move_on_etl(veh_locs_grid)
+                else:
+                    self.move_on_gpl(veh_locs_grid, lane_type_grid)
             
+            
+            
+        #if self.going_to_etl:
+         #   if self.is_near_etl():
+          #      self.move_to_etl(veh_locs_grid, lane_type_grid)
+           # else:
+            #    self.move_on_gpl(veh_locs_grid, lane_type_grid)     
+        #else:
+         #   if self.is_near_exit():
+          #      self.go_to_exit(veh_locs_grid, lane_type_grid)
+           # else:
+            #    if self.on_etl:
+             #       self.move_on_etl(veh_locs_grid)
+              #  else:
+               #     self.move_on_gpl(veh_locs_grid, lane_type_grid)
+
+    
