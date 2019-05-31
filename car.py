@@ -228,28 +228,126 @@ class Car(object):
         
             Note: All percent chances are not final and are just examples
         """
+            def want_to_move_to_ETL(self, curr_toll, time, etl_speed, gpl_speed):
+        # data used to determine influential factors and weights:
+        # 1. https://www.wsdot.wa.gov/sites/default/files/2009/12/29/ 
+        #    App5bTolling_Online_Survey_030510.pdf
+        # 2. https://www.wsdot.wa.gov/Tolling/EastsideCorridor/
+        #    EastsideCorridorTollingFAQ.htm#6
+        # 3. https://www.wsdot.wa.gov/sites/default/files/2009/12/29/
+        #    App5dFocusGroup_Tolling_Report.pdf
+        """ Uses factors that influence a car's decision to use toll lanes and
+            determines if they want to move to the ETL
+            
+            Parameters:
+                curr_toll: current toll price of ETL
+                time: what time it is
+                etl_speed: how fast ETL are moving
+                gpl_speed: how fast GPL are moving
+        """
         #Algorithm Data:
-        #Income
-        # Evaluate income as a proportion to the current Express Toll Lane toll
-        #   Different percentages will be put in to different brackets:
-        #   each bracket will add an increasing chance to move to ETL
+        want_to_move == False
+        #Income4
+        inc_props = [.0003, .0002, .0001, .00005, .000025, .00001]
+        inc_move = [0.0, 0.15, 0.3, 0.45, 0.6, .75, 1.0]
+        inc = curr_toll / self.income
+        if inc < inc_props[0]:
+            inc_score = inc_move[0]
+        elif inc_props[0] <= inc < inc_props[1]:
+            inc_score = inc_move[1]
+        elif inc_props[1] <= inc < inc_props[2]:
+            inc_score = inc_move[2]
+        elif inc_props[2] <= inc < inc_props[3]:
+            inc_score = inc_move[3]
+        elif inc_props[3] <= inc < inc_props[4]:
+            inc_score = inc_move[4]
+        elif inc_props[4] <= inc < inc_props[5]:
+            inc_score = inc_move[5]
+        else:
+            inc_score = inc_move[6]
+    
         #Time of day
-        # If it is peak you are more likely (5am-9am SB 3pm-7pm NB)
+        # peak hours have greatest influence (5am-9am SB 3pm-7pm NB)
+        if self.direction == 'South' and time > 5 and time < 9:
+            time_score = 1.0
+        elif self.direction == 'North' and time > 15 and time < 19:
+            time_score = 1.0
+        # lunch rush hours have second influence
+        elif time > 11 and time < 1:
+            time_score = 0.5
+        else:
+            time_score = 0.0
         #Frequent commuter
-        # Frequent commuters will have a more likely chance to move to ETL
-        # during peak hours
+        # frequent commuters during peak have greatest chance
+        if self.direction == 'South' and time > 5 and time < 9 and \
+        self.freq_commuter == True:
+            commuter_score = 1.0
+        elif self.direction == 'North' and time > 15 and time < 19 and \
+        self.freq_commuter == True:
+            commuter_score = 1.0
+        # frequent commuters in general have a slightly higher chance
+        elif self.freq_commuter == True:
+            commuter_score = .5
+        # if not a commuter, random effect from 0.0-0.5
+        else:
+            rand = np.random.uniform(0.0, 0.5)
+            commuter_score = rand
         #How many people they are travelling with
         # If they have #+ and a Good-To-Good pass, 100% chance to move to ETL
+        if self.pop >= 3 and self.has_gtg == True:
+            pop_score = 1.0
+        else:
+            pop_score = 0.0
         #If they have a good-to-go pass
         # Some percent more likely to merge depending on price because of the
-        #   $2 increase in toll without GTG pass
+        # $2 increase in toll without GTG pass
+        if self.has_gtg == True:
+            rand = np.random.uniform(0.5, 1.0)
+            gtg_score = rand
+        else:
+            gtg_score = 0.0
         #Urgency 
-        # If they are urgent, adds some chance to merge
-        #If there was a crash
-        # Influences speed of GPL
-        #Speed of general purpose lanes (GPL) vs ETL
-        # As ETL's move certain percentages faster than the GPL's, car's will be
-        # more likely to move to ETL at a similar rate
+        if self.in_a_hurry == True:
+            rand = np.random.uniform(0.7, 1.0)
+            hurry_score = rand
+        else:
+            hurry_score = 0.0
+        # How much faster are ETL's than GPL's
+        compare_speeds = [0, .15, .3, .45, .6, .75, .9, 1.0]
+        speed_inc = (etl_speed / gpl_speed) - 1.0
+        if speed_inc <= compare_speeds[0]:
+            speed_score = compare_speeds[0]
+        elif compare_speeds[0] < speed_inc <= compare_speeds[1]:
+            speed_score = compare_speeds[1]
+        elif compare_speeds[1] < speed_inc <= compare_speeds[2]:
+            speed_score = compare_speeds[2]
+        elif compare_speeds[2] < speed_inc <= compare_speeds[3]:
+            speed_score = compare_speeds[3]
+        elif compare_speeds[3] < speed_inc <= compare_speeds[4]:
+            speed_score = compare_speeds[4]
+        elif compare_speeds[4] < speed_inc <= compare_speeds[5]:
+            speed_score = compare_speeds[5]
+        elif compare_speeds[5] < speed_inc <= compare_speeds[6]:
+            speed_score = compare_speeds[6]
+        elif compare_speeds[6] < speed_inc <= compare_speeds[7]:
+            speed_score = compare_speeds[7]
+        else:
+            speed_score = 1.0
+        scores = np.array([inc_score, time_score, commuter_score, gtg_score, \
+                  hurry_score, speed_score])
+        # weights from 1-5
+        score_weights = np.array([4, 2, 1, 1, 3, 4])
+        # max score: 15
+        score = scores*score_weights
+        if 10 < score <= 15:
+            want_to_move = True
+        else:
+            want_to_move = False
+        # move
+        if want_to_move == True:
+            self.move_to_ETL()
+        else:
+            return False
         
             
         

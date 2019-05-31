@@ -21,11 +21,12 @@ class Highway:
         self.num_norm_lns = num_norm_lns
         self.num_etl_lns = num_etl
         self.length = length
+        self.width = num_norm_lns + num_etl
         self.is_peak = numpy.array(peak_arr)
         self.is_shoulder = numpy.array(shoulder_arr)
         self.min_toll = min_toll
         self.max_toll = max_toll
-        self.grid_per_mile = 7
+        self.grid_per_mile = 60
         self.exits_arr = []
         self.entrance_arr = []
         self.tolling_start = start_tolling
@@ -57,9 +58,9 @@ class Highway:
             roadway[i, -1, 1] = 2
         #Generate Exits and Entrances (Paired Sets)
         for i in exits:
-            roadway[math.floor(i*self.grid_per_mile - (0.5 * self.grid_per_mile)), 3, 3] = 2
+            roadway[math.floor(i*self.grid_per_mile - (0.1 * self.grid_per_mile)), 3, 3] = 2
             self.exits_arr.append(Exit(i/self.grid_per_mile))
-            roadway[math.ceil(i*self.grid_per_mile + 0.5 * self.grid_per_mile), 3, 3] = 1
+            roadway[math.ceil(i*self.grid_per_mile + 0.1 * self.grid_per_mile), 3, 3] = 1
             self.entrance_arr.append(Enter(i/self.grid_per_mile))
         return roadway
     

@@ -6,7 +6,7 @@ Created on Wed May 22 10:09:02 2019
 """
 
 class Enter:
-    def __init__(self, number, max_capacity=25, on_ramp_name):   
+    def __init__(self, number, on_ramp_name, max_capacity=25,):   
         self.on_ramp_name = on_ramp_name
         self.max = max_capacity
         self.count = 0
