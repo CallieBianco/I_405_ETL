@@ -50,7 +50,7 @@ for m in range(min_price):
                         enter_number = random.randint(0, len(north_highway.entrance_arr))
                         n_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], north_highway.grids_per_mile))
                     else:
-                        n_vehicle_list.append(Car())
+                        n_vehicle_list.append(Car('North'))
                 shift = 0
                 for i in range(len(n_vehicle_list)):
                     i -= shift
@@ -72,7 +72,7 @@ for m in range(min_price):
                         enter_number = random.randint(0, len(south_highway.entrance_arr))
                         s_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], south_highway.grids_per_mile))
                     else:
-                        s_vehicle_list.append(Car())
+                        s_vehicle_list.append(Car('South'))
                 shift = 0
                 for i in range(len(s_vehicle_list)):
                     i -= shift

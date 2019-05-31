@@ -8,19 +8,17 @@ Created on Wed May 22 10:08:13 2019
 
 """
 
-# to be combined with Abdullahi's code for Car.py
-
 import numpy as np
 import Income_Data as inc
 
 class Car(object):
     """ Defines a car object.
-
+    
         Data fields:
-            on_ramp:          Mile marker from which car enters I-405, 
+            on_ramp:          On-ramp name from which car enters I-405, 
                               associated with a city
             off_ramp:         Exit number that which car leaves I-405.
-            has_gtg:          Whether or not a car has a Good-to-Go! account
+            has_gtg:          Whether or not a car has a Good-to-Go! Account
             pop:              Number of passengers in car, including driver 
             can_shift_left:   Boolean if car can shift left
             can_move_forward: Boolean if car can move forward
@@ -33,7 +31,7 @@ class Car(object):
             horiz:            Car's position on the x-axis
             vertic:           Car's position on the y-axis
             speed:            How fast a car is moving
-
+            
         Constraints:
             * on_ramp and off_ramp will fall between Everett and Bellevue
             * 1 <= pop <= 8 (we are not considering vans)
@@ -41,6 +39,7 @@ class Car(object):
             * For this model, a Good-to-Go! pass will act as a Flex Pass
               for carpooling (pop >= 3) cars. (free access to ETL)
     """
+    
     def __init__(self, direction):
         self.direction = direction
         self.inc_data = inc.Income_Data()
@@ -48,21 +47,21 @@ class Car(object):
         self.off_ramp = self.init_off_ramp()
         self.income_class = self._class_breakdown() 
         self.city = self._city_data()
-        #self.has_gtg = self.init_has_gtg()
-        #self.pop = self.init_pop()
+        self.income = self.init_income()
+        self.has_gtg = self.init_has_gtg()
+        self.pop = self.init_pop()
         #self.can_shift_left = self.shift_left()
         #self.can_move_forward = False
         #self.can_shift_right = self.shift_right()
-        self.income = self.init_income()
         #self.length = 1
-        #self.freq_commuter = self.init_frequent()
+        self.freq_commuter = self.init_freq_commuter()
         self.in_a_hurry = self.init_hurry()
         #self.crashed = False
         #self.horiz = 0
         #self.vertic = 0
         #self.speed = 0 # mph
     
-     def init_on_ramp(self):
+    def init_on_ramp(self):
         # Hard to find data for
         # Educated guess of percentages based on populations
         # Found population of each city associated with an on-ramp
@@ -107,7 +106,7 @@ class Car(object):
                 return on_ramps_north[2]
             elif chance > chances_n[2] and chance < np.sum(chances_n[0:4]):
                 return on_ramps_north[3]
-    
+        
     def init_off_ramp(self):
         # randomly assigned off_ramps
         # Constraint: All exits are between Lynnwood and Bothell
@@ -140,7 +139,7 @@ class Car(object):
             else:
                 rint = np.random.randint(1,5)
                 return north_exits[rint]
-    
+        
     def init_income(self):
         """ Initializes income of a car based on city-data.
             
@@ -193,13 +192,39 @@ class Car(object):
             entered = self.inc_data.on_ramps_north[self.on_ramp] 
             
         return entered       
+
+    
+    def init_has_gtg(self):
+        GTG_PASS_PROB = 0.5
+        if np.random.uniform(0, 1) < GTG_PASS_PROB:
+            return True
+        else:
+            return False  
+            
+    def init_pop(self):
+        POP_PROBS = np.array([[1,2,3,4,5], [0.764, 0.884, 0.944, 0.974, 1]])
+        rand = np.random.uniform(0, 1)
+        pop = None
+        idx = 0
+        while pop is None:
+            if rand < POP_PROBS[1, idx]:
+                pop = POP_PROBS[0, idx]
+            else:
+                idx += 1
+        return pop
         
+    def init_freq_commuter(self):
+        FREQ_COMM_PROB = 0.8
+        if np.random.uniform(0, 1) < FREQ_COMM_PROB:
+            return True
+        else:
+            return False
+              
     def init_hurry(self):
         """ Determines chance of driver being in a hurry
-       
+        
             Percentage calculated based on data from: https://aaafoundation.org/
             wp-content/uploads/2018/03/TSCI-2017-Report.pdf
-
             Data used (percentages based on a 30-day basis):
                 * hurry is defined by driving 15mph over speed limit on freeway
                 * 49.6% of drivers are never in a hurry 
@@ -222,13 +247,21 @@ class Car(object):
                 return False
         else:
             return False
-        
-   def want_to_move_to_ETL(self):
-        """ Function not finished, plan is laid out below
-        
-            Note: All percent chances are not final and are just examples
+            
+    def want_to_move_to_ETL(self, curr_toll, time, etl_speed, gpl_speed, \
+                            score_weights=[8, 2, 3, 3, 6, 8]):
+        """ Uses factors that influence a car's decision to use toll lanes and
+            determines if they want to move to the ETL
+
+            Parameters:
+                curr_toll: current toll price of ETL
+                time: what time it is
+                etl_speed: how fast ETL are moving
+                gpl_speed: how fast GPL are moving
+                score_weights: how the scores are weighted. Default weight
+                               determined from find_best_weights() in
+                               Price_Elasticity_Model.py
         """
-            def want_to_move_to_ETL(self, curr_toll, time, etl_speed, gpl_speed):
         # data used to determine influential factors and weights:
         # 1. https://www.wsdot.wa.gov/sites/default/files/2009/12/29/ 
         #    App5bTolling_Online_Survey_030510.pdf
@@ -236,36 +269,29 @@ class Car(object):
         #    EastsideCorridorTollingFAQ.htm#6
         # 3. https://www.wsdot.wa.gov/sites/default/files/2009/12/29/
         #    App5dFocusGroup_Tolling_Report.pdf
-        """ Uses factors that influence a car's decision to use toll lanes and
-            determines if they want to move to the ETL
-            
-            Parameters:
-                curr_toll: current toll price of ETL
-                time: what time it is
-                etl_speed: how fast ETL are moving
-                gpl_speed: how fast GPL are moving
-        """
         #Algorithm Data:
-        want_to_move == False
+        want_to_move = False
         #Income4
-        inc_props = [.0003, .0002, .0001, .00005, .000025, .00001]
-        inc_move = [0.0, 0.15, 0.3, 0.45, 0.6, .75, 1.0]
-        inc = curr_toll / self.income
-        if inc < inc_props[0]:
+        inc_props = [.03, .02, .01, .008, .007, .006, .005]
+        inc_move = [0.0, 0.15, 0.3, 0.45, 0.6, .75, .9, 1.0]
+        inc = curr_toll / self.income * 100
+        if inc > inc_props[0]:
             inc_score = inc_move[0]
-        elif inc_props[0] <= inc < inc_props[1]:
+        elif inc_props[0] > inc > inc_props[1]:
             inc_score = inc_move[1]
-        elif inc_props[1] <= inc < inc_props[2]:
+        elif inc_props[1] > inc > inc_props[2]:
             inc_score = inc_move[2]
-        elif inc_props[2] <= inc < inc_props[3]:
+        elif inc_props[2] > inc > inc_props[3]:
             inc_score = inc_move[3]
-        elif inc_props[3] <= inc < inc_props[4]:
+        elif inc_props[3] > inc > inc_props[4]:
             inc_score = inc_move[4]
-        elif inc_props[4] <= inc < inc_props[5]:
+        elif inc_props[4] > inc > inc_props[5]:
             inc_score = inc_move[5]
-        else:
+        elif inc_props[5] > inc > inc_props[6]:
             inc_score = inc_move[6]
-    
+        else:
+            inc_score = inc_move[7]
+        
         #Time of day
         # peak hours have greatest influence (5am-9am SB 3pm-7pm NB)
         if self.direction == 'South' and time > 5 and time < 9:
@@ -335,19 +361,16 @@ class Car(object):
             speed_score = 1.0
         scores = np.array([inc_score, time_score, commuter_score, gtg_score, \
                   hurry_score, speed_score])
-        # weights from 1-5
-        score_weights = np.array([4, 2, 1, 1, 3, 4])
-        # max score: 15
-        score = scores*score_weights
-        if 10 < score <= 15:
+        # weights from 1-10
+        score = np.sum(scores*score_weights)
+        threshold = np.sum(score_weights)
+        # if the score is at least 50% of the total score, car moves
+        if score > (threshold / 2):
             want_to_move = True
         else:
             want_to_move = False
-        # move
-        if want_to_move == True:
-            self.move_to_ETL()
-        else:
-            return False
+        return want_to_move
         
             
         
+            
