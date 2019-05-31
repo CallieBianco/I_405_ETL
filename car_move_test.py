@@ -153,7 +153,15 @@ class Car2:
             return True
         return False
     
+    def update_nearest_etl(self):
+        entry_arr = self.highway.etl_entry_arr
+        for i in range(len(entry_arr)):
+            if self.vertic <= entry_arr[i][0]:
+                self.etl_entry_coord[0] = entry_arr[i][0]
+                self.etl_entry_coord[1] = entry_arr[i][1]
+    
     def is_near_etl(self):
+        self.update_nearest_etl()
         if self.etl_entry_coord[0] - self.vertic <= self.near_etl_length:
             return True
         return False
@@ -161,11 +169,8 @@ class Car2:
     def move(self, highway_grid):
         veh_locs_grid = highway_grid[:,:,0]
         lane_type_grid = highway_grid[:,:,1]
-        if self.going_to_etl:
-            if self.is_near_etl():
-                self.move_to_etl(veh_locs_grid, lane_type_grid)
-            else:
-                self.move_on_gpl(veh_locs_grid, lane_type_grid)     
+        if self.is_near_etl() and self.want_to_move_to_ETL():
+            self.move_to_etl(veh_locs_grid, lane_type_grid)
         else:
             if self.is_near_exit():
                 self.go_to_exit(veh_locs_grid, lane_type_grid)
@@ -174,6 +179,22 @@ class Car2:
                     self.move_on_etl(veh_locs_grid)
                 else:
                     self.move_on_gpl(veh_locs_grid, lane_type_grid)
+            
+            
+            
+        #if self.going_to_etl:
+         #   if self.is_near_etl():
+          #      self.move_to_etl(veh_locs_grid, lane_type_grid)
+           # else:
+            #    self.move_on_gpl(veh_locs_grid, lane_type_grid)     
+        #else:
+         #   if self.is_near_exit():
+          #      self.go_to_exit(veh_locs_grid, lane_type_grid)
+           # else:
+            #    if self.on_etl:
+             #       self.move_on_etl(veh_locs_grid)
+              #  else:
+               #     self.move_on_gpl(veh_locs_grid, lane_type_grid)
 
 def animate(grid_steps):
     # create the figure
