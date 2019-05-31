@@ -48,9 +48,9 @@ for m in range(min_price):
                 while bool(random.getrandbits(1)):
                     if random.randint(0, 1000000) / 1000000.0 <= percent_bus:
                         enter_number = random.randint(0, len(north_highway.entrance_arr))
-                        n_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], north_highway.grids_per_mile))
+                        n_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], north_highway.grid_per_mile))
                     else:
-                        n_vehicle_list.append(Car('North'))
+                        n_vehicle_list.append(Car('North', north_highway.grid_per_mile / 2.0, north_highway.grid_per_mile / 2.0, north_highway, north_highway.grid_per_mile))
                 shift = 0
                 for i in range(len(n_vehicle_list)):
                     i -= shift
@@ -70,9 +70,9 @@ for m in range(min_price):
                 while bool(random.getrandbits(1)):
                     if random.randint(0, 1000000) / 1000000.0 <= percent_bus:
                         enter_number = random.randint(0, len(south_highway.entrance_arr))
-                        s_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], south_highway.grids_per_mile))
+                        s_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], south_highway.grid_per_mile))
                     else:
-                        s_vehicle_list.append(Car('South'))
+                        s_vehicle_list.append(Car('South', north_highway.grid_per_mile / 2.0, north_highway.grid_per_mile / 2.0, north_highway, north_highway.grid_per_mile))
                 shift = 0
                 for i in range(len(s_vehicle_list)):
                     i -= shift

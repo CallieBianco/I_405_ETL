@@ -62,9 +62,9 @@ class Highway:
         #Generate Exits and Entrances (Paired Sets)
         for i in exits:
             roadway[math.floor(i*self.grid_per_mile - (0.1 * self.grid_per_mile)), 3, 3] = 2
-            self.exits_arr.append(Exit(i/self.grid_per_mile))
+            self.exits_arr.append(Exit(i, self.grid_per_mile))
             roadway[math.ceil(i*self.grid_per_mile + 0.1 * self.grid_per_mile), 3, 3] = 1
-            self.entrance_arr.append(Enter(i/self.grid_per_mile))
+            self.entrance_arr.append(Enter(i, self.grid_per_mile))
         return roadway
     
     def get_speed(self, grid_moved, time, lane):
