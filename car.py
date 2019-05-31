@@ -59,6 +59,7 @@ class Car(object):
         self.etl_entry_coord = [0,0] # (vertic, horiz)
         self.horiz = 3
         self.vertic = 1
+        self.neat_exit_length = near_exit_length
         self.near_etl_length = near_etl_length
         self.highway = highway
         self.max_forward_moves = max_forward_moves
