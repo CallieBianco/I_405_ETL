@@ -36,6 +36,7 @@ class Highway:
         self.shoulder_open = False
         self.etl_price = 0
         self.grid = self._generate_road(exit_loc_arr)
+        self.etl_entry_arr = [[158, 1], [317, 1]]
 
         
     def _generate_road(self, exits):
