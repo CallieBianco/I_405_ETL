@@ -470,7 +470,7 @@ class Car(object):
             return num_moves
     
     def move_on_etl(self, veh_locs_grid):
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         return self.move_forward(max_forward, veh_locs_grid)
     
