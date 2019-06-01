@@ -17,7 +17,7 @@ class Highway:
                  shoulder_arr=[], min_toll=0.75, \
                  max_toll=10.00, exit_loc_arr=[],\
                  start_shoulder=1500, end_shoulder=1700,
-                 start_tolling=500, end_tolling=1900):
+                 start_tolling=500, end_tolling=1900, etl_on=[]):
         self.num_norm_lns = num_norm_lns
         self.num_etl_lns = num_etl
         self.length = length
@@ -36,7 +36,7 @@ class Highway:
         self.shoulder_open = False
         self.etl_price = 0
         self.grid = self._generate_road(exit_loc_arr)
-        self.etl_entry_arr
+        self.etl_entry_arr = etl_on
 
         
     def _generate_road(self, exits):

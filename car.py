@@ -41,7 +41,7 @@ class Car(object):
               for carpooling (pop >= 3) cars. (free access to ETL)
     """
     
-    def __init__(self, direction, near_etl_length, near_exit_length, highway, \
+    def __init__(self, direction, near_etl_length, near_exit_length, var_highway, \
                  max_forward_moves):
         self.direction = direction
         self.inc_data = inc.Income_Data()
@@ -63,11 +63,11 @@ class Car(object):
         self.vertic = 1
         self.neat_exit_length = near_exit_length
         self.near_etl_length = near_etl_length
-        self.highway = highway
+        self.highway = var_highway
         self.max_forward_moves = max_forward_moves
     
     def init_exit_coord(self):
-        num_gpl = self.highway.grid[0,:,0] - 3
+        num_gpl = self.highway.num_norm_lns
         last = num_gpl + 2
         exit_coords = [[479, last],[359, last],[299, last],[239, last],\
                 [119, last]]

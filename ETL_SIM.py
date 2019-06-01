@@ -63,7 +63,7 @@ for m in range(min_price):
                         n_vehicle_list.remove(i)
                         shift += 1
                 for i in range(len(north_highway.exits_arr)):
-                    north_highway.exits_arr.deplete()
+                    north_highway.exits_arr[i].deplete()
                     
                     
             #South Highway
@@ -84,5 +84,5 @@ for m in range(min_price):
                         s_vehicle_list.remove(i)
                         shift += 1
                 for i in range(len(north_highway.exits_arr)):
-                    north_highway.exits_arr.deplete()        
+                    north_highway.exits_arr[i].deplete()        
     
