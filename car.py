@@ -29,7 +29,7 @@ class Car(object):
             freq_commuter:    Boolean if they are a frequent commuter or not
             in_a_hurry:       Boolean if in a hurry
             crashed:          Boolean for if car has crashed
-            x:            Car's position on the x-axis
+            horiz:            Car's position on the x-axis
             vertic:           Car's position on the y-axis
             speed:            How fast a car is moving
             
@@ -57,15 +57,11 @@ class Car(object):
         self.in_a_hurry = self.init_hurry()
         self.going_to_etl = False
         self.on_etl = False
-        self.etl_entry_coord = [0,0] # (vertic, x)
+        self.etl_entry_coord = [0,0] # (vertic, horiz)
         self.exit_coord = [0,0]
-        self.x = 3
+        self.horiz = 3
         self.vertic = 1
-<<<<<<< HEAD
         self.neat_exit_length = near_exit_length
-=======
-        self.near_exit_length = near_exit_length
->>>>>>> ea53027c9677876ea89aaa474311eaa620f2f068
         self.near_etl_length = near_etl_length
         self.highway = highway
         self.max_forward_moves = max_forward_moves
@@ -366,20 +362,20 @@ class Car(object):
     
     def can_shift_left(self, veh_locs_grid, lane_type_grid):
         # Check if general purpose lane to left
-        if lane_type_grid[self.vertic, self.x - 1] != 0:
+        if lane_type_grid[self.vertic, self.horiz - 1] != 0:
             return False
-        if veh_locs_grid[self.vertic, self.x - 1] == 0 and \
-                veh_locs_grid[self.vertic - 1, self.x - 1] == 0:
+        if veh_locs_grid[self.vertic, self.horiz - 1] == 0 and \
+                veh_locs_grid[self.vertic - 1, self.horiz - 1] == 0:
             return True
         else:
             return False
     
     def can_shift_right(self, veh_locs_grid, lane_type_grid):
         # Check if general purpose lane to right
-        if lane_type_grid[self.vertic, self.x + 1] != 0:
+        if lane_type_grid[self.vertic, self.horiz + 1] != 0:
             return False
-        if veh_locs_grid[self.vertic, self.x + 1] == 0 and \
-                veh_locs_grid[self.vertic - 1, self.x + 1] == 0:
+        if veh_locs_grid[self.vertic, self.horiz + 1] == 0 and \
+                veh_locs_grid[self.vertic - 1, self.horiz + 1] == 0:
             return True
         else:
             return False
@@ -388,7 +384,7 @@ class Car(object):
     def get_max_left(self, veh_locs_grid, grid_length):
         max_moves = 0
         idx = self.vertic + 1
-        while idx < grid_length and veh_locs_grid[idx, self.x - 1] == 0:
+        while idx < grid_length and veh_locs_grid[idx, self.horiz - 1] == 0:
             max_moves += 1
             idx += 1
         return max_moves
@@ -396,7 +392,7 @@ class Car(object):
     def get_max_right(self, veh_locs_grid, grid_length):
         max_moves = 0
         idx = self.vertic + 1
-        while idx < grid_length and veh_locs_grid[idx, self.x + 1] == 0:
+        while idx < grid_length and veh_locs_grid[idx, self.horiz + 1] == 0:
             max_moves += 1
             idx += 1
         return max_moves
@@ -404,29 +400,29 @@ class Car(object):
     def get_max_forward(self, veh_locs_grid, grid_length):
         max_moves = 0
         idx = self.vertic + 1
-        while idx < grid_length and veh_locs_grid[idx, self.x] == 0:
+        while idx < grid_length and veh_locs_grid[idx, self.horiz] == 0:
             max_moves += 1
             idx += 1
         return max_moves
     
     def shift_left(self, veh_locs_grid):
-        self.remove_old_loc(veh_locs_grid, self.vertic, self.x)
-        self.x -= 1
-        self.add_new_loc(veh_locs_grid, self.vertic, self.x)
+        self.remove_old_loc(veh_locs_grid, self.vertic, self.horiz)
+        self.horiz -= 1
+        self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
         
     
     def shift_right(self, veh_locs_grid):
-        self.remove_old_loc(veh_locs_grid, self.vertic, self.x)
-        self.x += 1
-        self.add_new_loc(veh_locs_grid, self.vertic, self.x)
+        self.remove_old_loc(veh_locs_grid, self.vertic, self.horiz)
+        self.horiz += 1
+        self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
     
     def move_forward(self, space_avail, veh_locs_grid):
         moves = space_avail if space_avail < self.max_forward_moves else \
                 self.max_forward_moves
         temp_vertic = self.vertic
         self.vertic += moves
-        self.remove_old_loc(veh_locs_grid, temp_vertic, self.x)
-        self.add_new_loc(veh_locs_grid, self.vertic, self.x)
+        self.remove_old_loc(veh_locs_grid, temp_vertic, self.horiz)
+        self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
         return moves
         
     def move_on_gpl(self, veh_locs_grid, lane_type_grid):
@@ -448,7 +444,7 @@ class Car(object):
         else:
             self.shift_left(veh_locs_grid)
             num_moves = self.move_forward(max_left, veh_locs_grid)
-            return num_moves
+    return num_moves
     
     def move_on_etl(self, veh_locs_grid):
         grid_length = N.size(veh_locs_grid[:, 0])
@@ -466,7 +462,7 @@ class Car(object):
         num_moves = self.move_forward(min_move, veh_locs_grid)
         on_exit = False
         if self.vertic == self.exit_coord[0] and \
-                self.x == self.exit_coord[1]:
+                self.horiz == self.exit_coord[1]:
                 on_exit = True
         return [num_moves, on_exit]
     
