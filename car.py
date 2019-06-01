@@ -46,7 +46,8 @@ class Car(object):
         self.direction = direction
         self.inc_data = inc.Income_Data()
         self.on_ramp = self.init_on_ramp()
-        self.off_ramp = self.init_off_ramp()
+        self.init_exit_coord()
+        #self.off_ramp = self.init_off_ramp()
         self.income_class = self._class_breakdown() 
         self.city = self._city_data()
         self.income = self.init_income()
@@ -60,10 +61,23 @@ class Car(object):
         self.exit_coord = [0,0]
         self.x = 3
         self.vertic = 1
+<<<<<<< HEAD
+        self.neat_exit_length = near_exit_length
+=======
         self.near_exit_length = near_exit_length
+>>>>>>> ea53027c9677876ea89aaa474311eaa620f2f068
         self.near_etl_length = near_etl_length
         self.highway = highway
         self.max_forward_moves = max_forward_moves
+    
+    def init_exit_coord(self):
+        num_gpl = self.highway.grid[0,:,0] - 3
+        last = num_gpl + 2
+        exit_coords = [[479, last],[359, last],[299, last],[239, last],\
+                [119, last]]
+        idx = np.random.randint(0, len(exit_coords))
+        self.exit_coord[0] = exit_coords[idx][0]
+        self.exit_coord[1] = exit_coords[idx][1]
     
     def init_on_ramp(self):
         # Hard to find data for
@@ -110,39 +124,6 @@ class Car(object):
                 return on_ramps_north[2]
             elif chance > chances_n[2] and chance < np.sum(chances_n[0:4]):
                 return on_ramps_north[3]
-        
-    def init_off_ramp(self):
-        # randomly assigned off_ramps
-        # Constraint: All exits are between Lynnwood and Bothell
-        # Southbound: includes a "past Bothell" exit
-        # Northbound: includes a "before Bothell" exit
-        south_exits = ['SR 527', 'NE 195th', 'SR 522', 'NE 160th', 'NE 124th', \
-                       'Past Bothell']
-        north_exits = ['Before Bothell', 'SR 527', 'I5 North', 'I5 South', \
-                       'SR 525']
-        # Assume at least half of cars are going to go past Bothell
-        if self.direction == 'South':
-            if self.on_ramp == 'Bothell':
-                return south_exits[-1]
-            else:
-                rand = np.random.uniform()
-                if rand <= .5:
-                    return south_exits[-1]
-                else:
-                    rint = np.random.randint(0,5)
-                    return south_exits[rint]
-        # Assume at least half of cars will exit before Bothell
-        else:
-            if self.on_ramp != 'Bothell':
-                rand = np.random.uniform()
-                if rand <= .5:
-                    return north_exits[0]
-                else:
-                    rint = np.random.randint(1,5)
-                    return north_exits[rint]
-            else:
-                rint = np.random.randint(1,5)
-                return north_exits[rint]
         
     def init_income(self):
         """ Initializes income of a car based on city-data.
@@ -452,7 +433,7 @@ class Car(object):
         max_left = 0
         max_right = 0
         max_forward = 0
-        grid_length = np.size(veh_locs_grid[:, 0])
+        grid_length = N.size(veh_locs_grid[:, 0])
         if self.can_shift_left(veh_locs_grid, lane_type_grid):
             max_left = self.get_max_left(veh_locs_grid, grid_length)
         if self.can_shift_right(veh_locs_grid, lane_type_grid):
@@ -470,7 +451,7 @@ class Car(object):
             return num_moves
     
     def move_on_etl(self, veh_locs_grid):
-        grid_length = np.size(veh_locs_grid[:, 0])
+        grid_length = N.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         return self.move_forward(max_forward, veh_locs_grid)
     
@@ -478,7 +459,7 @@ class Car(object):
         while self.can_shift_right(veh_locs_grid, lane_type_grid):
             self.shift_right(veh_locs_grid)
         space_until_exit = self.exit_coord[0] - self.vertic
-        grid_length = np.size(veh_locs_grid[:, 0])
+        grid_length = N.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         min_move = space_until_exit if space_until_exit < max_forward else \
                 max_forward
@@ -493,7 +474,7 @@ class Car(object):
         while self.can_shift_left(veh_locs_grid, lane_type_grid):
             self.shift_left(veh_locs_grid)
         space_until_entrance = self.etl_entry_coord[0] - self.vertic
-        grid_length = np.size(veh_locs_grid[:, 0])
+        grid_length = N.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         min_move = space_until_entrance if space_until_entrance < max_forward \
                 else max_forward
@@ -541,21 +522,4 @@ class Car(object):
                 else:
                     num_moves = self.move_on_gpl(veh_locs_grid, lane_type_grid)
         return [num_moves, highway, on_exit]
-            
-            
-            
-        #if self.going_to_etl:
-         #   if self.is_near_etl():
-          #      self.move_to_etl(veh_locs_grid, lane_type_grid)
-           # else:
-            #    self.move_on_gpl(veh_locs_grid, lane_type_grid)     
-        #else:
-         #   if self.is_near_exit():
-          #      self.go_to_exit(veh_locs_grid, lane_type_grid)
-           # else:
-            #    if self.on_etl:
-             #       self.move_on_etl(veh_locs_grid)
-              #  else:
-               #     self.move_on_gpl(veh_locs_grid, lane_type_grid)
-
     
