@@ -20,7 +20,7 @@ def graph_color_gradient(arr, time_step, min_price, max_price, dir):
             norm=norm,boundaries=bounds,ticks=[0, 25, 50, 75, 100])"""
     
     ax = sns.heatmap(arr.grid[:, :, 0], xticklabels=False, yticklabels=False, vmin=0, vmax=1)
-    newpath = os.path.join('D:', "traffic_sims", str(dir), str("ETL_SIM_OUTPUT"), str(min_price), str(max_price), str(time_step))
+    newpath = os.path.join('D:', os.sep, "traffic_sims", str(dir), str("ETL_SIM_OUTPUT"), str(min_price), str(max_price), str(time_step))
     if not os.path.exists(newpath):
         os.makedirs(newpath)
     #pp.savefig('D:' + "\traffic_sims" + '\' + str(dir) + os.sep + str("ETL_SIM_OUTPUT") + os.sep + str(min_price) + os.sep + str(max_price) + os.sep + str(time_step) + '-diffusion.png')

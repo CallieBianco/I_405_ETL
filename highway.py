@@ -37,6 +37,8 @@ class Highway:
         self.etl_price = 0
         self.grid = self._generate_road(exit_loc_arr)
         self.etl_entry_arr = etl_on
+        self.etl_speed = 60
+        self.gpl_speed = 60
 
         
     def _generate_road(self, exits):
@@ -72,10 +74,10 @@ class Highway:
         Calculate the Average speed of a lane
         
         lane is the index of the lane (from left to right) that the speed is being determined for
-        grid_moved is the aggregate number of squares moved by vehicles in lane
+        grid_moved is the aggregate number of squares moved by vehicles in lane, starting from 0 for the left most lane
         time is the timestep used in the driver program (fractions of an hour)
         
-        vehiucles must report lane number and number of squares moved
+        vehiucles must report number of squares moved
         """
         num_vehicles = 0
         for i in range(self.length*self.grid_per_mile):
