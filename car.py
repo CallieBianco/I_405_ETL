@@ -429,7 +429,7 @@ class Car(object):
         max_left = 0
         max_right = 0
         max_forward = 0
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         if self.can_shift_left(veh_locs_grid, lane_type_grid):
             max_left = self.get_max_left(veh_locs_grid, grid_length)
         if self.can_shift_right(veh_locs_grid, lane_type_grid):
@@ -444,10 +444,10 @@ class Car(object):
         else:
             self.shift_left(veh_locs_grid)
             num_moves = self.move_forward(max_left, veh_locs_grid)
-    return num_moves
+        return num_moves
     
     def move_on_etl(self, veh_locs_grid):
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         return self.move_forward(max_forward, veh_locs_grid)
     
@@ -455,7 +455,7 @@ class Car(object):
         while self.can_shift_right(veh_locs_grid, lane_type_grid):
             self.shift_right(veh_locs_grid)
         space_until_exit = self.exit_coord[0] - self.vertic
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         min_move = space_until_exit if space_until_exit < max_forward else \
                 max_forward
@@ -470,7 +470,7 @@ class Car(object):
         while self.can_shift_left(veh_locs_grid, lane_type_grid):
             self.shift_left(veh_locs_grid)
         space_until_entrance = self.etl_entry_coord[0] - self.vertic
-        grid_length = N.size(veh_locs_grid[:, 0])
+        grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         min_move = space_until_entrance if space_until_entrance < max_forward \
                 else max_forward

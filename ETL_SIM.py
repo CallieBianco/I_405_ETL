@@ -27,9 +27,11 @@ sim_number = 1000000
 time_range = 24 * 60
 time_step = 1
 
-length_highway = 8
-exit_loc_array = []
-enter_loc_array = []
+length_highway = 11
+n_exit_loc_array = [5, 7, 8, 9, 10]
+s_exit_loc_array = [1, 2, 3, 5, 6]
+
+enter_loc_array = [5, 7, 8, 9, 10]
 peak_arr = []
 
 for m in range(min_price):
@@ -37,8 +39,8 @@ for m in range(min_price):
     for n in range(max_price):
         n *= price_interval
         for c in range(sim_number):
-            north_highway = Highway(length_highway)
-            south_highway = Highway(length_highway, min_toll=m, max_toll=n)
+            north_highway = Highway(length_highway, min_toll=m, max_toll=n, exit_loc_arr=n_exit_loc_array)
+            south_highway = Highway(length_highway, min_toll=m, max_toll=n, exit_loc_arr=s_exit_loc_array)
             n_vehicle_list = []
             s_vehicle_list = []
             #North Highway
@@ -50,7 +52,7 @@ for m in range(min_price):
                         enter_number = random.randint(0, len(north_highway.entrance_arr))
                         n_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], north_highway.grids_per_mile))
                     else:
-                        n_vehicle_list.append(Car('North'))
+                        n_vehicle_list.append(Car('North', north_highway.grid_per_mile / 2.0, north_highway.grid_per_mile / 2.0, north_highway, north_highway.grid_per_mile))
                 shift = 0
                 for i in range(len(n_vehicle_list)):
                     i -= shift
@@ -72,7 +74,7 @@ for m in range(min_price):
                         enter_number = random.randint(0, len(south_highway.entrance_arr))
                         s_vehicle_list.append(Bus(3, north_highway.entrance_arr[enter_number], south_highway.grids_per_mile))
                     else:
-                        s_vehicle_list.append(Car('South'))
+                        s_vehicle_list.append(Car('South', south_highway.grid_per_mile / 2.0, south_highway.grid_per_mile / 2.0, south_highway, south_highway.grid_per_mile))
                 shift = 0
                 for i in range(len(s_vehicle_list)):
                     i -= shift
