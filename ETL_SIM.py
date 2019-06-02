@@ -38,17 +38,19 @@ north_peak_end = 17*60
 peak_arr = []
 
 for m in range(min_price):
-    m *= price_interval
-    for n in range(min_price, max_price):
+    mt = m * price_interval
+    for n in range(m, max_price):
+        m = mt
         n *= price_interval
         for c in range(sim_number):
             north_highway = Highway(length_highway, min_toll=m, max_toll=n, exit_loc_arr=n_exit_loc_array)
             south_highway = Highway(length_highway, min_toll=m, max_toll=n, exit_loc_arr=s_exit_loc_array)
             n_vehicle_list = []
+            print(n_vehicle_list)
             s_vehicle_list = []
             #North Highway
             for t in range(time_range):
-                #file_saver.graph_color_gradient(north_highway, t, m, n, 'north')
+                file_saver.graph_color_gradient(north_highway, t, m, n, 'north')
                 #print(len(n_vehicle_list))
                 n_total_moved_per_step = numpy.zeros((north_highway.width))
                 while bool(random.getrandbits(1)):
