@@ -39,7 +39,7 @@ peak_arr = []
 
 for m in range(min_price):
     m *= price_interval
-    for n in range(max_price):
+    for n in range(min_price, max_price):
         n *= price_interval
         for c in range(sim_number):
             north_highway = Highway(length_highway, min_toll=m, max_toll=n, exit_loc_arr=n_exit_loc_array)
