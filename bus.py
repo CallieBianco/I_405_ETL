@@ -19,7 +19,7 @@ class Bus:
         self.near_exit_condition = 0.5 * gpm #half mile
         self.range_checker = np.zeros((1, 3), dtype='f')
         self.max = gpm
-        self.exit = 0
+        self.exit = None
         
     def move(self, arr, timestep):
         """
@@ -35,7 +35,7 @@ class Bus:
             if arr.grid[self.y-1, self.x - 1, 0] == 0 and arr.grid[self.y, self.x - 1, 1] != 2 and arr.grid[self.y, self.x - 1, 0] == 0 and arr.grid[self.y+1, self.x - 1, 0] == 0:
                 squares_moved, arr = self._shift_left(arr)
                 total_moved += squares_moved
-            squares_moved, arr = self._move_forward(arr) 
+            squares_moved, arr, exited = self._move_forward(arr) 
             total_moved += squares_moved
             
         elif arr.grid[self.y+1, self.x, 0] ==  0 and arr.grid[self.y + 2, self.x, 0] ==  0:
@@ -57,8 +57,10 @@ class Bus:
     def _move_forward(self, arr):
         squares_moved = 0
         while arr.grid[self.y+1, self.x, 0] == 0 and arr.grid[self.y + 2, self.x, 0] == 0 and arr.grid[self.y + 3, self.x, 0] == 0 and squares_moved < self.max:
-            if self.y >= self.exit:
-                return squares_moved, arr
+            if self.y >= self.exit.y:
+                return squares_moved, arr, True
+            if self.y + 6 >= arr.length * arr.grid_per_mile:
+                return squares_moved, arr, True
             arr.grid[self.y - 1, self.x, 0] == False
             arr.grid[self.y + 2, self.x, 0] == True
             squares_moved += 1
@@ -83,13 +85,13 @@ class Bus:
         return 1, arr
         
     def _near_exit(self, arr):
-        return self.y >= self.exit - (0.1 * arr.grid_per_mile)
+        return self.y >= self.exit.y - (0.1 * arr.grid_per_mile)
             
     def _gen_exit(self, arr):
          for i in range(len(arr.exits_arr)):
              if self.y < arr.exits_arr[i].y:
-                 return int(arr.exits_arr[i].y)
-             return arr.length
+                 return arr.exits_arr[i]
+             return arr.exits_arr[-1]
                 
                 
                 

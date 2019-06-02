@@ -11,6 +11,8 @@ Created on Wed May 22 10:08:13 2019
 # to be combined with Abdullahi's code for Car.py
 import numpy as np
 import Income_Data as inc
+from exit import Exit
+from highway import Highway
 
 class Car(object):
     """ Defines a car object.
@@ -59,13 +61,20 @@ class Car(object):
         self.going_to_etl = False
         self.on_etl = False
         self.etl_entry_coord = [0,0] # (y, x)
-        self.exit_coord = [0,0]
+        self.exit = self.init_exit(highway)
         self.x = 3
         self.y = 1
         self.near_exit_length = near_exit_length
         self.near_etl_length = near_etl_length
         self.max_forward_moves = max_forward_moves
-    
+        
+    def init_exit(self, highway):
+        for i in range(len(highway.exits_arr)):
+            if highway.exits_arr[i].y == self.exit_coord[0]:
+                return highway.exits_arr[i]
+            else:
+                return highway.exits_arr[-1]
+                
     def init_exit_coord(self):
         num_gpl = self.highway.grid[0,:,0] - 3
         last = num_gpl + 2
@@ -462,8 +471,10 @@ class Car(object):
                 max_forward
         num_moves = self.move_forward(min_move, veh_locs_grid)
         on_exit = False
-        if self.y == self.exit_coord[0] and \
-                self.x == self.exit_coord[1]:
+        tx = int(self.exit_coord[1][0])
+        ty = int(self.exit_coord[0])
+        if self.y == ty and \
+                self.x == tx:
                 on_exit = True
         return [num_moves, on_exit]
     
