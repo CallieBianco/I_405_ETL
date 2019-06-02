@@ -25,4 +25,4 @@ def graph_color_gradient(arr, time_step, min_price, max_price, direct):
         os.makedirs(newpath)
     os.chdir(newpath)
     pp.savefig(str(time_step) + '.png')
-    pp.show()
+    #pp.show()
