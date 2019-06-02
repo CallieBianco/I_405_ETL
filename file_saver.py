@@ -19,7 +19,7 @@ def graph_color_gradient(arr, time_step, min_price, max_price, dir):
     pp.colorbar(img,cmap=cmap,
             norm=norm,boundaries=bounds,ticks=[0, 25, 50, 75, 100])"""
     
-    ax = sns.heatmap(arr.grid[:, :, 0], xticklabels=False, yticklabels=False, vmin=0, vmax=1)
+    ax = sns.heatmap(arr.grid[:, 1:-1, 0], xticklabels=False, yticklabels=False, vmin=0, vmax=1)
     newpath = os.path.join('D:', os.sep, "traffic_sims", str(dir), str("ETL_SIM_OUTPUT"), str(min_price), str(max_price), str(time_step))
     if not os.path.exists(newpath):
         os.makedirs(newpath)

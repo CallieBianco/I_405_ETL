@@ -48,7 +48,8 @@ for m in range(min_price):
             s_vehicle_list = []
             #North Highway
             for t in range(time_range):
-                file_saver.graph_color_gradient(north_highway, t, m, n, 'north')
+                #file_saver.graph_color_gradient(north_highway, t, m, n, 'north')
+                #print(len(n_vehicle_list))
                 n_total_moved_per_step = numpy.zeros((north_highway.width))
                 while bool(random.getrandbits(1)):
                     if random.randint(0, 1000000) / 1000000.0 <= percent_bus:
@@ -62,7 +63,8 @@ for m in range(min_price):
                     grids_squares_moved, north_highway, exited = n_vehicle_list[i].move(north_highway, t)
                     n_total_moved_per_step[n_vehicle_list[i].x-1] += grids_squares_moved
                     if exited == True:
-                        north_highway.exits[(n_vehicle_list[i].exit)].intake(n_vehicle_list[i])                       
+                        north_highway.exits[(n_vehicle_list[i].exit)].intake(n_vehicle_list[i])  
+                        print(exited)
                         n_vehicle_list.remove(i)
                         shift += 1
                 for i in range(len(north_highway.exits_arr)):
