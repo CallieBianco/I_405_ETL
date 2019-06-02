@@ -88,7 +88,7 @@ for m in range(min_price):
                 shift = 0
                 for i in range(len(s_vehicle_list)):
                     i -= shift
-                    grids_squares_moved, south_highway, exited = s_vehicle_list[i].move(south_highway)                   
+                    grids_squares_moved, south_highway, exited = s_vehicle_list[i].move(south_highway, t)                   
                     s_total_moved_per_step[n_vehicle_list[i].x-1] += grids_squares_moved
                     if exited == True:                        
                         south_highway.exits[(s_vehicle_list[i].exit)].intake(s_vehicle_list[i]) 
