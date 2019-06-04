@@ -272,7 +272,81 @@ def price_sensitivity():
     plt.xlabel("Toll Price ($)")
     plt.ylabel("Proportion of Cars in ETL")
     plt.show() 
+    
+def speed_price_sensitivity():
+    """ Analyzes how proportion of cars in ETLs vs GPL changes as toll price
+        changes and as speed differences change.
+        
+    """ 
+    # Change peak prices
+    PEAK = np.arange(.75, 10, .25)
+    # keep at average
+    NON = 1.25
+    NUM_CARS_NON_PEAK = 100
+    NUM_CARS_PEAK = 200
+    # simulate tolling hours (non-tolling hours, ETLs act as regular lanes)
+    START = 5
+    END = 19
+    # Use average speeds (northbound is same proportion as southbound)
+    PEAK_ETL_SPEED = np.arange(30, 67)
+    PEAK_GPL_SPEED = 30
+    NON_ETL_SPEED = 60
+    NON_GPL_SPEED = 55
+    S_PEAK = np.arange(START, 10)
+    N_PEAK = np.arange(15, END+1)
+    S_NON = np.arange(10, END)
+    N_NON = np.arange(START, 15)
+    TOTAL_CARS = (NUM_CARS_PEAK*(len(S_PEAK))) + (NUM_CARS_NON_PEAK* \
+                  (len(S_NON)))
+    #for n in range(10):
+    changes_s = np.zeros(len(PEAK))
+    changes_n = np.zeros(len(PEAK))
+    SIM = 100
+    """
+    for k in range(SIM):
+        for n in range(len(PEAK)):
+            count = 0
+            for i in range(len(S_PEAK)):
+                for j in range(NUM_CARS_PEAK):
+                    sc = Car(direction='South')
+                    if sc.want_to_move_to_ETL(PEAK[n], S_PEAK[i], PEAK_ETL_SPEED[n], \
+                                            PEAK_GPL_SPEED) == True:
+                        count += 1
+            for i in range(len(S_NON)):
+                for j in range(NUM_CARS_NON_PEAK):
+                    sc = Car(direction='South')
+                    if sc.want_to_move_to_ETL(NON, S_NON[i], NON_ETL_SPEED, \
+                                              NON_GPL_SPEED) == True:
+                        count += 1
+            changes_s[n] += count / TOTAL_CARS
+    changes_s /= SIM
+    """
+    for k in range(SIM):
+        for n in range(len(PEAK)):
+            count = 0
+            for i in range(len(N_PEAK)):
+                for j in range(NUM_CARS_PEAK):
+                    nc = Car(direction='North')
+                    if nc.want_to_move_to_ETL(PEAK[n], N_PEAK[i], PEAK_ETL_SPEED[n], \
+                                              PEAK_GPL_SPEED) == True:
+                        count += 1
+            for i in range(len(N_NON)):
+                for j in range(NUM_CARS_NON_PEAK):
+                    nc = Car(direction='North')
+                    if nc.want_to_move_to_ETL(NON, N_NON[i], NON_ETL_SPEED, \
+                                              NON_GPL_SPEED) == True:
+                        count += 1
+            changes_n[n] += count / TOTAL_CARS
+    changes_n /= SIM
+    
+    plt.plot(PEAK, changes_n, 'm')
+    plt.title("Northbound: Proportion of Total Cars in ETLs as \n \
+            ETL Toll Price Increases and Speed Difference Increases")
+    plt.xlabel("Toll Price ($)")
+    plt.ylabel("Proportion of Cars in ETL")
+    plt.show() 
+    
 #speed_sensitivity()
 #price_sensitivity()
-    
+#speed_price_sensitivity()
     
