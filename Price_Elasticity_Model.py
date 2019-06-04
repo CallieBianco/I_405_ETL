@@ -346,6 +346,105 @@ def speed_price_sensitivity():
     plt.ylabel("Proportion of Cars in ETL")
     plt.show() 
     
+def speeds_change():
+    """ Determines if the set of weights is valid
+    """
+    # determine most appropriate weights
+    # On average between Lynnwood and Bothell both ways, 
+    # data: https://www.wsdot.wa.gov/sites/default/files/2018/12/27/
+    #       Toll-405-ETL-36-Month-Report.pdf
+    # Proportion of cars expected to drive in ETL's: expected_proportion_use()
+    expected = expected_proportion_use()
+    
+    # use average tolls to test: $5 during peak and $1.25 in non-peak
+    PEAK = np.arange(.75, 10, .25)
+    # keep at average
+    NON = 1.25
+    NUM_CARS_NON_PEAK = 5000
+    NUM_CARS_PEAK = 10000
+    # simulate only tolling hours: 5am-7pm
+    START = 5
+    END = 19
+    # peak avg speeds southbound (same proportion was northbound too)
+    # start at average speeds
+    PEAK_ETL_SPEED = 60
+    PEAK_GPL_SPEED = 60
+    NON_ETL_SPEED = 60
+    NON_GPL_SPEED = 60
+    S_PEAK = np.arange(START, 10)
+    N_PEAK = np.arange(15, END+1)
+    S_NON = np.arange(10, END)
+    N_NON = np.arange(START, 16)
+    # https://www.omnicalculator.com/everyday-life/traffic-density
+    TOTAL_CARS = (NUM_CARS_PEAK*(len(S_PEAK))) + (NUM_CARS_NON_PEAK* \
+                  (len(S_NON)))
+    SIM = 1
+    diff = 0
+    tol_gpl = 0
+    tol_etl = 0
+    for k in range(SIM):
+        for n in range(len(PEAK)):
+            print("Peak toll = " + str(PEAK[n]))
+            count = 0
+            for i in range(len(S_PEAK)):
+                num_cars_gpl = 0
+                num_cars_etl = 0
+                for j in range(NUM_CARS_PEAK):
+                    sc = Car(direction='South')
+                    num_cars_gpl += 1
+                    # speeds are affected
+                    if sc.want_to_move_to_ETL(PEAK[n], S_PEAK[i], PEAK_ETL_SPEED, \
+                                            PEAK_GPL_SPEED, [8, 2, 3, 3, 6, 8]) == True:
+                        count += 1
+                        num_cars_etl += 1
+                        num_cars_gpl -= 1
+                # total cars on gpl's and etl's so far
+                tol_gpl += num_cars_gpl
+                tol_etl += num_cars_etl
+                # number of cars per hour
+                gpl_flow = num_cars_gpl
+                etl_flow = num_cars_etl
+                # total cars over total length
+                g_density = tol_gpl / 60
+                e_density = tol_etl / 60
+                # update speeds
+                PEAK_ETL_SPEED = etl_flow / e_density
+                PEAK_GPL_SPEED = gpl_flow / g_density
+                if PEAK_GPL_SPEED <= 0.0:
+                    PEAK_GPL_SPEED = 60
+                print("Time: " + str(i))
+                print("New ETL speed: " + str(PEAK_ETL_SPEED))
+                print("New GPL speed: " + str(PEAK_GPL_SPEED))
+                print(num_cars_gpl)
+                print(num_cars_etl)
+                    
+        for i in range(len(S_NON)):
+            for j in range(NUM_CARS_NON_PEAK):
+                sc = Car(direction='South')
+                num_cars_gpl += 1
+                if sc.want_to_move_to_ETL(NON, S_NON[i], NON_ETL_SPEED, \
+                                        NON_GPL_SPEED, [8, 2, 3, 3, 6, 8]) == True:
+                    count += 1
+                    num_cars_etl += 1
+                    num_cars_gpl -= 1
+        """
+        for i in range(len(N_PEAK)):
+            for j in range(NUM_CARS_PEAK):
+                sc = Car(direction='North')
+                if sc.want_to_move_to_ETL(PEAK, N_PEAK[i], PEAK_ETL_SPEED, \
+                                        PEAK_GPL_SPEED, props) == True:
+                    count += 1
+        for i in range(len(N_NON)):
+            for j in range(NUM_CARS_NON_PEAK):
+                sc = Car(direction='North')
+                if sc.want_to_move_to_ETL(NON, N_NON[i], NON_ETL_SPEED, \
+                                        NON_GPL_SPEED, props) == True:
+                    count += 1
+        """
+        print("GPL: " + str(num_cars_gpl))
+        print("ETL: " + str(num_cars_etl))
+
+    
 #speed_sensitivity()
 #price_sensitivity()
 #speed_price_sensitivity()
