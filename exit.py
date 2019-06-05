@@ -6,11 +6,11 @@ Created on Wed May 22 10:08:55 2019
 """
 
 class Exit:
-    def __init__(self, number, grids_per_mile, y, max_capacity=25):    
+    def __init__(self, number, grids_per_mile, y, max_capacity=10):    
         self.max = max_capacity
         self.count = 0
         self.number_dispensed = 0
-        self.dispense_num = 5
+        self.dispense_num = 50
         self.id = number
         self.y = y
         

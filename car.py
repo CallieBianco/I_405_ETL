@@ -46,10 +46,9 @@ class Car(object):
     def __init__(self, direction, near_etl_length, near_exit_length, highway, \
                  max_forward_moves):
         self.direction = direction
-        self.highway = highway
         self.inc_data = inc.Income_Data()
         self.on_ramp = self.init_on_ramp()
-        self.exit_coord = self.init_exit_coord()
+        self.exit_coord = self.init_exit_coord(highway)
         #self.off_ramp = self.init_off_ramp()
         self.income_class = self._class_breakdown() 
         self.city = self._city_data()
@@ -75,8 +74,8 @@ class Car(object):
             else:
                 return highway.exits_arr[-1]
                 
-    def init_exit_coord(self):
-        num_gpl = self.highway.grid[0,:,0] - 3
+    def init_exit_coord(self, highway):
+        num_gpl = highway.grid[0,:,0] - 3
         last = num_gpl + 2
         exit_coords = [[479, last],[359, last],[299, last],[239, last],\
                 [119, last]]
@@ -331,6 +330,8 @@ class Car(object):
             hurry_score = 0.0
         # How much faster are ETL's than GPL's
         compare_speeds = [0, .15, .3, .45, .6, .75, .9, 1.0]
+        if gpl_speed == 0:
+            gpl_speed = 1
         speed_inc = (etl_speed / gpl_speed) - 1.0
         if speed_inc <= compare_speeds[0]:
             speed_score = compare_speeds[0]
@@ -410,7 +411,7 @@ class Car(object):
     def get_max_forward(self, veh_locs_grid, grid_length):
         max_moves = 0
         idx = self.y + 1
-        while idx < grid_length and veh_locs_grid[idx, self.x] == 0:
+        while idx+1 < grid_length and veh_locs_grid[idx+1, self.x] == 0 and veh_locs_grid[idx, self.x] == 0:
             max_moves += 1
             idx += 1
         return max_moves
@@ -435,7 +436,7 @@ class Car(object):
         self.add_new_loc(veh_locs_grid, self.y, self.x)
         return moves
         
-    def move_on_gpl(self, veh_locs_grid, lane_type_grid):
+    def move_on_gpl(self, veh_locs_grid, lane_type_grid, hw):
         max_left = 0
         max_right = 0
         max_forward = 0
@@ -461,7 +462,7 @@ class Car(object):
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         return self.move_forward(max_forward, veh_locs_grid)
     
-    def go_to_exit(self, veh_locs_grid, lane_type_grid):
+    def go_to_exit(self, veh_locs_grid, lane_type_grid, hw):
         while self.can_shift_right(veh_locs_grid, lane_type_grid):
             self.shift_right(veh_locs_grid)
         space_until_exit = self.exit_coord[0] - self.y
@@ -476,6 +477,8 @@ class Car(object):
         if self.y == ty and \
                 self.x == tx:
                 on_exit = True
+        if self.y + 0.5 * hw.grid_per_mile >= hw.length*hw.grid_per_mile:
+            on_exit = True
         return [num_moves, on_exit]
     
     def move_to_etl(self, veh_locs_grid, lane_type_grid):
@@ -493,20 +496,20 @@ class Car(object):
             self.going_to_etl = False
         return num_moves
         
-    def is_near_exit(self):
-        if self.exit_coord[0] - self.y <= self.near_exit_length:
+    def is_near_exit(self, arr):
+        if self.exit_coord[0] - self.y <= self.near_exit_length or self.y + 0.5 * arr.grid_per_mile >= arr.length * arr.grid_per_mile:
             return True
         return False
     
-    def update_nearest_etl(self):
-        entry_arr = self.highway.etl_entry_arr
+    def update_nearest_etl(self, highway):
+        entry_arr = highway.etl_entry_arr
         for i in range(len(entry_arr)):
             if self.y <= entry_arr[i][0]:
                 self.etl_entry_coord[0] = entry_arr[i][0]
                 self.etl_entry_coord[1] = entry_arr[i][1]
     
-    def is_near_etl(self):
-        self.update_nearest_etl()
+    def is_near_etl(self, highway):
+        self.update_nearest_etl(highway)
         if self.etl_entry_coord[0] - self.y <= self.near_etl_length:
             return True
         return False
@@ -517,17 +520,27 @@ class Car(object):
         lane_type_grid = highway_grid[:,:,1]
         num_moves = 0
         on_exit = False
-        if not self.on_etl and self.is_near_etl() and self.want_to_move_to_ETL(highway.etl_price, timestep, highway.etl_speed, highway.gpl_speed):
+        if self.y + highway.grid_per_mile >= highway.length * highway.grid_per_mile:
+            on_exit = True
+        if not self.on_etl and self.is_near_etl(highway) and self.want_to_move_to_ETL(highway.etl_price, timestep, highway.etl_speed, highway.gpl_speed):
             num_moves = self.move_to_etl(veh_locs_grid, lane_type_grid)
+            if self.y + highway.grid_per_mile >= highway.length * highway.grid_per_mile:
+                on_exit = True
         else:
-            if self.is_near_exit():
-               arr = self.go_to_exit(veh_locs_grid, lane_type_grid)
+            if self.is_near_exit(highway):
+               arr = self.go_to_exit(veh_locs_grid, lane_type_grid, highway)
                num_moves = arr[0]
                on_exit = arr[1]
             else:
                 if self.on_etl:
                     num_moves = self.move_on_etl(veh_locs_grid)
                 else:
-                    num_moves = self.move_on_gpl(veh_locs_grid, lane_type_grid)
+                    num_moves = self.move_on_gpl(veh_locs_grid, lane_type_grid, highway)
+        if self.y + highway.grid_per_mile >= highway.length * highway.grid_per_mile:
+            on_exit = True
+        if on_exit == True:
+            highway.grid[self.y, self.x, 0] == False
+            highway.grid[self.y-1, self.x, 0] == False
+            highway.grid[self.y+1, self.x, 0] == False            
         return [num_moves, highway, on_exit]
     

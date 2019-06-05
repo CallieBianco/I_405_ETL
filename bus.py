@@ -51,7 +51,14 @@ class Bus:
             total_moved += squares_moved
             squares_moved, arr, exited  = self._move_forward(arr)  
             total_moved += squares_moved
-        
+        if self.y + arr.grid_per_mile >= arr.length * arr.grid_per_mile:
+            exited = True
+        if exited == True:
+            arr.grid[self.y - 1, self.x, 0] == False
+            arr.grid[self.y, self.x, 0] == False
+            arr.grid[self.y + 1, self.x, 0] == False    
+            arr.grid[self.y + 2, self.x, 0] == False 
+            arr.grid[self.y - 2, self.x, 0] == False 
         return total_moved, arr, exited
             
     def _move_forward(self, arr):
@@ -59,7 +66,7 @@ class Bus:
         while arr.grid[self.y+1, self.x, 0] == 0 and arr.grid[self.y + 2, self.x, 0] == 0 and arr.grid[self.y + 3, self.x, 0] == 0 and squares_moved < self.max:
             if self.y >= self.exit.y:
                 return squares_moved, arr, True
-            if self.y + 6 >= arr.length * arr.grid_per_mile:
+            if self.y + arr.grid_per_mile >= arr.length * arr.grid_per_mile:
                 return squares_moved, arr, True
             arr.grid[self.y - 1, self.x, 0] == False
             arr.grid[self.y + 2, self.x, 0] == True

@@ -27,7 +27,7 @@ class Highway:
         self.is_shoulder = numpy.array(shoulder_arr)
         self.min_toll = min_toll
         self.max_toll = max_toll
-        self.grid_per_mile = 360
+        self.grid_per_mile = 10
         self.exits_arr = []
         self.entrance_arr = []
         self.tolling_start = start_tolling
@@ -64,13 +64,13 @@ class Highway:
                 roadway[i, j + 1, 1] = 1
         #Generate Exits and Entrances (Paired Sets)
         for i in exits:
-            roadway[math.floor(i*self.grid_per_mile - (0.1 * self.grid_per_mile)), 3, 3] = 2
-            self.exits_arr.append(Exit(i,self.grid_per_mile, i*self.grid_per_mile - (0.1 * self.grid_per_mile)))
-            roadway[math.ceil(i*self.grid_per_mile + 0.1 * self.grid_per_mile), 3, 3] = 1
-            self.entrance_arr.append(Enter(i,self.grid_per_mile, i*self.grid_per_mile + 0.1 * self.grid_per_mile))
-        roadway[self.length * self.grid_per_mile - 1, 3, 3] = 2
-        roadway[self.length * self.grid_per_mile - 1, 2, 3] = 2
-        roadway[self.length * self.grid_per_mile - 1, 1, 3] = 2
+            roadway[math.floor(i*self.grid_per_mile), 3, 3] = 2
+            self.exits_arr.append(Exit(i,self.grid_per_mile, i*self.grid_per_mile))
+            roadway[math.ceil(i*self.grid_per_mile), 3, 3] = 1
+            self.entrance_arr.append(Enter(i,self.grid_per_mile, i*self.grid_per_mile))
+        roadway[self.length - 1, 3, 3] = 2
+        roadway[self.length - 1, 2, 3] = 2
+        roadway[self.length - 1, 1, 3] = 2
         self.exits_arr.append(Exit(self.length,self.grid_per_mile, self.length * self.grid_per_mile))
         roadway[0, 3, 3] = 1
         roadway[0, 2, 3] = 1
@@ -92,6 +92,8 @@ class Highway:
         for i in range(self.length*self.grid_per_mile):
             if self.grid[i, 1 + lane, 0] == 1:
                 num_vehicles += 1
+        if num_vehicles == 0:
+            num_vehicles += 1
         miles_moved = grid_moved / self.grid_per_mile
         miles_per_vehicle = miles_moved / num_vehicles
         
