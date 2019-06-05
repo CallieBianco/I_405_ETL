@@ -1,7 +1,6 @@
 import numpy as N
 import matplotlib.pyplot as plt
 import time
-
 class Car2:
     def __init__(self, near_etl_length, near_exit_length, highway, \
             max_forward_moves):
@@ -21,7 +20,6 @@ class Car2:
     def remove_old_loc(self, veh_locs_grid, ver, hor):
         veh_locs_grid[ver, hor] = 0
         veh_locs_grid[ver - 1, hor] = 0
-
     def add_new_loc(self, veh_locs_grid, ver, hor):
         veh_locs_grid[ver, hor] = 1
         veh_locs_grid[ver - 1, hor] = 1
@@ -153,15 +151,7 @@ class Car2:
             return True
         return False
     
-    def update_nearest_etl(self):
-        entry_arr = self.highway.etl_entry_arr
-        for i in range(len(entry_arr)):
-            if self.vertic <= entry_arr[i][0]:
-                self.etl_entry_coord[0] = entry_arr[i][0]
-                self.etl_entry_coord[1] = entry_arr[i][1]
-    
     def is_near_etl(self):
-        self.update_nearest_etl()
         if self.etl_entry_coord[0] - self.vertic <= self.near_etl_length:
             return True
         return False
@@ -169,32 +159,20 @@ class Car2:
     def move(self, highway_grid):
         veh_locs_grid = highway_grid[:,:,0]
         lane_type_grid = highway_grid[:,:,1]
-        if self.is_near_etl() and self.want_to_move_to_ETL():
-            self.move_to_etl(veh_locs_grid, lane_type_grid)
+        if self.going_to_etl:
+            if self.is_near_etl():
+                self.move_to_etl(veh_locs_grid, lane_type_grid)
+            else:
+                self.move_on_gpl(veh_locs_grid, lane_type_grid)     
         else:
             if self.is_near_exit():
                 self.go_to_exit(veh_locs_grid, lane_type_grid)
             else:
                 if self.on_etl:
+                    self.move_on_etl()
                     self.move_on_etl(veh_locs_grid)
                 else:
                     self.move_on_gpl(veh_locs_grid, lane_type_grid)
-            
-            
-            
-        #if self.going_to_etl:
-         #   if self.is_near_etl():
-          #      self.move_to_etl(veh_locs_grid, lane_type_grid)
-           # else:
-            #    self.move_on_gpl(veh_locs_grid, lane_type_grid)     
-        #else:
-         #   if self.is_near_exit():
-          #      self.go_to_exit(veh_locs_grid, lane_type_grid)
-           # else:
-            #    if self.on_etl:
-             #       self.move_on_etl(veh_locs_grid)
-              #  else:
-               #     self.move_on_gpl(veh_locs_grid, lane_type_grid)
 
 def animate(grid_steps):
     # create the figure
@@ -212,8 +190,7 @@ def animate(grid_steps):
         #redraw the figure
         fig.canvas.draw()
 
-
-if __name__ == "__main__":
+def test():
     grids = N.zeros((20, 6, 4))
     grids[:, 0, 1] = 2
     grids[:, -1, 1] = 2
@@ -252,26 +229,10 @@ if __name__ == "__main__":
             grids[1,2,0] == 0 and grids[0,2,0] == 0 and \
             car.vertic == 1 and car.horiz == 3:
         print("passed test 5")
-    
-    # Checking GPL travel and exiting
-    #car.add_new_loc(grids[:,:,0], 1, 3)
-    #car.add_new_loc(grids[:,:,0], 3, 3)
-    #car.add_new_loc(grids[:,:,0], 3, 2)
-    #grid_steps = []
-    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
-    #car.move(grids)
-    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
-    #car.move(grids)
-    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
-    #car.move(grids)
-    #grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
-    #animate(grid_steps)
-    
-    # ETL testing
+
     car.add_new_loc(grids[:,:,0], 1, 3)
-    car.going_to_etl = True
-    car.etl_entry_coord[0] = 6
-    car.etl_entry_coord[1] = 1
+    car.add_new_loc(grids[:,:,0], 3, 3)
+    car.add_new_loc(grids[:,:,0], 3, 2)
     grid_steps = []
     grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
     car.move(grids)
@@ -281,8 +242,6 @@ if __name__ == "__main__":
     car.move(grids)
     grid_steps.append(N.ndarray.tolist(grids[:,:,0]))
     animate(grid_steps)
-    
-    
-    
-    
+if __name__ == "__main__":
+    test()
     
