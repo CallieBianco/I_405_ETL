@@ -1,3 +1,21 @@
+# -*- coding: utf-8 -*-
+#=======================================================================
+#                        General Documentation
+""" Testing suite for Car objects move function.
+    
+    Tests the cars ability to move and animates the movement
+"""
+#-----------------------------------------------------------------------
+#                       Additional Documentation
+#
+# Original by Abdullahi Diriye, UW Bothell
+#
+# Notes:
+# - Written for Python 3.7.2.
+# - Part of larger I-405 Simulation
+#=======================================================================
+
+
 import numpy as N
 import matplotlib.pyplot as plt
 import time
@@ -18,14 +36,23 @@ class Car2:
     
     
     def remove_old_loc(self, veh_locs_grid, ver, hor):
+        """ Removes old location of car from grid
+                
+        """
         veh_locs_grid[ver, hor] = 0
         veh_locs_grid[ver - 1, hor] = 0
+        
     def add_new_loc(self, veh_locs_grid, ver, hor):
+        """ Adds new location of car to grid
+                
+        """
         veh_locs_grid[ver, hor] = 1
         veh_locs_grid[ver - 1, hor] = 1
     
     def can_shift_left(self, veh_locs_grid, lane_type_grid):
-        # Check if general purpose lane to left
+        """ Checks if car can shift left
+                
+        """
         if lane_type_grid[self.vertic, self.horiz - 1] != 0:
             return False
         if veh_locs_grid[self.vertic, self.horiz - 1] == 0 and \
@@ -35,7 +62,9 @@ class Car2:
             return False
     
     def can_shift_right(self, veh_locs_grid, lane_type_grid):
-        # Check if general purpose lane to right
+        """ Checks if car can shift right
+                
+        """
         if lane_type_grid[self.vertic, self.horiz + 1] != 0:
             return False
         if veh_locs_grid[self.vertic, self.horiz + 1] == 0 and \
@@ -44,8 +73,11 @@ class Car2:
         else:
             return False
     
-    # Note: Do all cars take an exit located on the grid?
+
     def get_max_left(self, veh_locs_grid, grid_length):
+        """ Gets the max amount a car can move in the left lane
+                
+        """
         max_moves = 0
         idx = self.vertic + 1
         while idx < grid_length and veh_locs_grid[idx, self.horiz - 1] == 0:
@@ -54,6 +86,9 @@ class Car2:
         return max_moves
     
     def get_max_right(self, veh_locs_grid, grid_length):
+        """ Gets the max amount a car can move in the right lane
+                
+        """
         max_moves = 0
         idx = self.vertic + 1
         while idx < grid_length and veh_locs_grid[idx, self.horiz + 1] == 0:
@@ -62,6 +97,9 @@ class Car2:
         return max_moves
     
     def get_max_forward(self, veh_locs_grid, grid_length):
+        """ Gets the max amount a car can move in the current lane
+                
+        """
         max_moves = 0
         idx = self.vertic + 1
         while idx < grid_length and veh_locs_grid[idx, self.horiz] == 0:
@@ -70,17 +108,26 @@ class Car2:
         return max_moves
     
     def shift_left(self, veh_locs_grid):
+        """ Makes the car shift left
+                
+        """
         self.remove_old_loc(veh_locs_grid, self.vertic, self.horiz)
         self.horiz -= 1
         self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
         
     
     def shift_right(self, veh_locs_grid):
+        """ Makes the car shift right
+                
+        """
         self.remove_old_loc(veh_locs_grid, self.vertic, self.horiz)
         self.horiz += 1
         self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
     
     def move_forward(self, space_avail, veh_locs_grid):
+        """ Makes the car go forward
+                
+        """
         moves = space_avail if space_avail < self.max_forward_moves else \
                 self.max_forward_moves
         temp_vertic = self.vertic
@@ -89,6 +136,9 @@ class Car2:
         self.add_new_loc(veh_locs_grid, self.vertic, self.horiz)
         
     def move_on_gpl(self, veh_locs_grid, lane_type_grid):
+        """ Defines behavior of car on General Purpose Lane
+                
+        """
         max_left = 0
         max_right = 0
         max_forward = 0
@@ -108,18 +158,23 @@ class Car2:
             self.move_forward(max_left, veh_locs_grid)
     
     def move_on_etl(self, veh_locs_grid):
+        """ Defines the cars behavior for moving on Express Toll Lane
+                
+        """
         grid_length = N.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         self.move_forward(max_forward, veh_locs_grid)
     
     def remove_car(self):
+        """ Removes car
+                
+        """
         print("Car removed")
-        #exit_dict = self.highway.string_to_int
-        #exit_idx = exit_dict[self.off_ramp]
-        #exit_ramp = self.highway.exits_arr[exit_idx]
-        #exit_ramp.intake(self)
     
     def go_to_exit(self, veh_locs_grid, lane_type_grid):
+        """ Defines behavior when car is close to exit
+                
+        """
         while self.can_shift_right(veh_locs_grid, lane_type_grid):
             self.shift_right(veh_locs_grid)
         space_until_exit = self.exit_coord[0] - self.vertic
@@ -133,6 +188,9 @@ class Car2:
             self.remove_car()
     
     def move_to_etl(self, veh_locs_grid, lane_type_grid):
+        """ Defines behavior when car is moving to Express Toll Lane
+                
+        """
         while self.can_shift_left(veh_locs_grid, lane_type_grid):
             self.shift_left(veh_locs_grid)
         space_until_entrance = self.etl_entry_coord[0] - self.vertic
@@ -147,16 +205,25 @@ class Car2:
             self.going_to_etl = False
         
     def is_near_exit(self):
+        """ Checks if car is near exit
+                
+        """
         if self.exit_coord[0] - self.vertic <= self.near_exit_length:
             return True
         return False
     
     def is_near_etl(self):
+        """ Checks if car is near Express Toll Lane
+                
+        """
         if self.etl_entry_coord[0] - self.vertic <= self.near_etl_length:
             return True
         return False
     
     def move(self, highway_grid):
+        """ Moves car
+                
+        """
         veh_locs_grid = highway_grid[:,:,0]
         lane_type_grid = highway_grid[:,:,1]
         if self.going_to_etl:
@@ -175,6 +242,9 @@ class Car2:
                     self.move_on_gpl(veh_locs_grid, lane_type_grid)
 
 def animate(grid_steps):
+    """ Animates each step of car movement
+                
+    """
     # create the figure
     fig = plt.figure()
     ax = fig.add_subplot(111)

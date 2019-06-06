@@ -393,14 +393,23 @@ class Car(object):
         return want_to_move
         
     def remove_old_loc(self, veh_locs_grid, ver, hor):
+        """ Removes old location of car from grid
+                
+        """
         veh_locs_grid[ver, hor] = 0
         veh_locs_grid[ver - 1, hor] = 0
 
     def add_new_loc(self, veh_locs_grid, ver, hor):
+        """ Adds new location of car to grid
+                
+        """
         veh_locs_grid[ver, hor] = 1
         veh_locs_grid[ver - 1, hor] = 1
     
     def can_shift_left(self, veh_locs_grid, lane_type_grid):
+        """ Checks if car can shift left
+                
+        """
         # Check if general purpose lane to left
         if lane_type_grid[self.y, self.x - 1] != 0:
             return False
@@ -411,7 +420,9 @@ class Car(object):
             return False
     
     def can_shift_right(self, veh_locs_grid, lane_type_grid):
-        # Check if general purpose lane to right
+        """ Checks if car can shift right
+                
+        """
         if lane_type_grid[self.y, self.x + 1] != 0:
             return False
         if veh_locs_grid[self.y, self.x + 1] == 0 and \
@@ -422,6 +433,9 @@ class Car(object):
     
     # Note: Do all cars take an exit located on the grid?
     def get_max_left(self, veh_locs_grid, grid_length):
+        """ Gets the max amount a car can move in the left lane
+                
+        """
         max_moves = 0
         idx = self.y + 1
         while idx < grid_length and veh_locs_grid[idx, self.x - 1] == 0:
@@ -430,6 +444,9 @@ class Car(object):
         return max_moves
     
     def get_max_right(self, veh_locs_grid, grid_length):
+        """ Gets the max amount a car can move in the right lane
+                
+        """
         max_moves = 0
         idx = self.y + 1
         while idx < grid_length and veh_locs_grid[idx, self.x + 1] == 0:
@@ -438,6 +455,9 @@ class Car(object):
         return max_moves
     
     def get_max_forward(self, veh_locs_grid, grid_length):
+        """ Gets the max amount a car can move in the current lane
+                
+        """
         max_moves = 0
         idx = self.y + 1
         while idx+1 < grid_length and veh_locs_grid[idx+1, self.x] == 0 \
@@ -447,17 +467,26 @@ class Car(object):
         return max_moves
     
     def shift_left(self, veh_locs_grid):
+        """ Makes the car shift left
+                
+        """
         self.remove_old_loc(veh_locs_grid, self.y, self.x)
         self.x -= 1
         self.add_new_loc(veh_locs_grid, self.y, self.x)
         
     
     def shift_right(self, veh_locs_grid):
+        """ Makes the car shift right
+                
+        """
         self.remove_old_loc(veh_locs_grid, self.y, self.x)
         self.x += 1
         self.add_new_loc(veh_locs_grid, self.y, self.x)
     
     def move_forward(self, space_avail, veh_locs_grid):
+        """ Makes the car go forward
+                
+        """
         moves = space_avail if space_avail < self.max_forward_moves else \
                 self.max_forward_moves
         temp_y = self.y
@@ -467,6 +496,9 @@ class Car(object):
         return moves
         
     def move_on_gpl(self, veh_locs_grid, lane_type_grid, hw):
+        """ Defines behavior of car on General Purpose Lane
+                
+        """
         max_left = 0
         max_right = 0
         max_forward = 0
@@ -488,11 +520,17 @@ class Car(object):
         return num_moves
     
     def move_on_etl(self, veh_locs_grid):
+        """ Defines behavior of car on Express Toll Lane
+                
+        """
         grid_length = np.size(veh_locs_grid[:, 0])
         max_forward = self.get_max_forward(veh_locs_grid, grid_length)
         return self.move_forward(max_forward, veh_locs_grid)
     
     def go_to_exit(self, veh_locs_grid, lane_type_grid, hw):
+        """ Defines behavior when car is close to exit
+                
+        """
         while self.can_shift_right(veh_locs_grid, lane_type_grid):
             self.shift_right(veh_locs_grid)
         space_until_exit = self.exit_coord[0] - self.y
@@ -512,6 +550,9 @@ class Car(object):
         return [num_moves, on_exit]
     
     def move_to_etl(self, veh_locs_grid, lane_type_grid):
+        """ Defines behavior when car is moving to Express Toll Lane
+                
+        """
         while self.can_shift_left(veh_locs_grid, lane_type_grid):
             self.shift_left(veh_locs_grid)
         space_until_entrance = self.etl_entry_coord[0] - self.y
@@ -527,12 +568,18 @@ class Car(object):
         return num_moves
         
     def is_near_exit(self, arr):
+        """ Checks if car is near exit
+                
+        """
         if self.exit_coord[0] - self.y <= self.near_exit_length or \
            self.y + 0.5 * arr.grid_per_mile >= arr.length * arr.grid_per_mile:
             return True
         return False
     
     def update_nearest_etl(self, highway):
+        """ Updates nearest ETL coordinates
+                
+        """
         entry_arr = highway.etl_entry_arr
         for i in range(len(entry_arr)):
             if self.y <= entry_arr[i][0]:
@@ -540,12 +587,18 @@ class Car(object):
                 self.etl_entry_coord[1] = entry_arr[i][1]
     
     def is_near_etl(self, highway):
+        """ Checks if car is near an Express Toll Lane
+                
+        """
         self.update_nearest_etl(highway)
         if self.etl_entry_coord[0] - self.y <= self.near_etl_length:
             return True
         return False
     
     def move(self, highway, timestep):
+        """ Moves the car
+                
+        """
         highway_grid = highway.grid
         veh_locs_grid = highway_grid[:,:,0]
         lane_type_grid = highway_grid[:,:,1]
