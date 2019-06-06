@@ -1,9 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed May 22 10:08:24 2019
+#=======================================================================
+#                        General Documentation
+#
+    # Agent for I-405 Simulation
+#
+#-----------------------Additional Documentation------------------------
 
-@author: awsir
-"""
+# Modification History:
+# - 19 May 2019: Bus.py created by Adam Sirkis
+# - 04 June 2019: Bus.py finalized by Adam Sirkis
+
+# Notes:
+# - Developed for Python 3.x
+
+#=======================================================================
+
 import numpy
 import math
 
@@ -16,13 +26,35 @@ class Highway:
     def __init__(self, length, num_norm_lns=2, num_etl=1, peak_arr=[],\
                  shoulder_arr=[], min_toll=0.75, \
                  max_toll=10.00, exit_loc_arr=[],\
-                 start_shoulder=1500, end_shoulder=1700,
                  start_tolling=500, end_tolling=1900, etl_on=[]):
+        """ Construct a Highway
+        
+        Method Arguments:
+            - length: number to rpesent the length of the highway
+            - num_norm_lns : number of GPL lanes
+            - num_etl: number of ETL
+            -peak_arr : array-like of the peak traffic times
+            - shoulder_arr[] : array-like of time the shoulder is open
+            - min_toll : number repesenting the minimum toll
+            - max_toll : number representing the maximum toll
+            - exit_loc_arr : array-like representing the locatiosn of exit
+            - start_tolling : time to start tolling
+            - end_tolling : time to end tolling
+            - etl_on : array-like of locations that vehicles can enter the ETL
+            
+        Member Variables:
+            - num_lns : total number of lanes
+            - grid_per_mile : number of grid squares per mile
+            - shoulder_open : bool representing if the shoulder is open
+            - etl_speed : current speed fo the ETL
+            - gpl_speed : current speed of the GPL
+            - Grid: 3-D Numpy arraay defined by _generate_road
+        
+        """
         self.num_norm_lns = num_norm_lns
         self.num_etl_lns = num_etl
         self.num_lns = num_norm_lns + num_etl
         self.length = length
-        self.width = num_norm_lns + num_etl
         self.is_peak = numpy.array(peak_arr)
         self.is_shoulder = numpy.array(shoulder_arr)
         self.min_toll = min_toll
@@ -32,8 +64,6 @@ class Highway:
         self.entrance_arr = []
         self.tolling_start = start_tolling
         self.tolling_end = end_tolling
-        self.start_shoulder=start_shoulder
-        self.end_shoulder = end_shoulder
         self.shoulder_open = False
         self.etl_price = 0
         self.grid = self._generate_road(exit_loc_arr)
@@ -54,6 +84,13 @@ class Highway:
         The second index stores the type of terrain (0 = GPL, 1 = ETL, 2 = barrier)
         Third Index stores if it is an On-ramp, Off-ramp, or neither (0 = neither, 1 = On-ramp, 2 = Off-ramp)
         Fourth Index stores current price (GPL = 0.00, ETL = max_toll where is_peak is true, ETL = min_toll where is_peak = false and is_toll = true, ETL = 0.00 where is_peak and is_toll are false)
+        
+        
+        Method Arguments:
+            - exits: aray of exit locations
+            
+        Returns:
+            - grid representing the roadway
         """
         roadway = numpy.zeros((self.length*self.grid_per_mile, self.num_norm_lns + self.num_etl_lns + 2, 4), dtype='f')
         #Build Barriers on Either side
@@ -82,9 +119,10 @@ class Highway:
         """
         Calculate the Average speed of a lane
         
-        lane is the index of the lane (from left to right) that the speed is being determined for
-        grid_moved is the aggregate number of squares moved by vehicles in lane, starting from 0 for the left most lane
-        time is the timestep used in the driver program (fractions of an hour)
+        Method Arguments:
+            -lane i: index of the lane (from left to right)
+            -grid_moved : the aggregate number of squares moved
+            -time : is the timestep used (fractions of an hour)
         
         vehiucles must report number of squares moved
         """
@@ -101,6 +139,12 @@ class Highway:
         return miles_per_vehicle_per_hour
     
     def set_toll(self, time_step):
+        """
+        Set the toll fo the ETL
+        
+        Methdo Arguments:
+            - time_step : numebr representing the time step in the seuqence
+        """
         if time_step >= self.tolling_start and time_step < self.tolling_end:
             if self.is_peak[time_step]:
                 self.etl_price = self.max_toll
@@ -116,15 +160,20 @@ class Highway:
             self.etl_price = 0
 
     def open_shoulder(self, time_step):
-        if time_step >= self.start_shoulder and time_step < self.end_shoulder and self.shoulder_open == False:
+        """
+        Open the HSoulder
+        
+        Method Arguments:
+            - time_step : number representing the time step in the sequence
+        """
+        if time_step >= self.start_shoulder and \
+        time_step < self.end_shoulder and \
+        self.shoulder_open == False:
             self.shoulder_open = True
             self.num_norm_lns += 1
-            """temp = numpy.zeros(numpy.shape((self.length*self.grid_per_mile, self.num_norm_lns + self.num_etl_lns + 3, 4)), dtype='f')
-            temp[:, 0:-2, :] = self.grid[:, 0:-1, :]
-            temp[:, self.num_norm_lns + self.num_etl_lns + 2, :] = self.grid[:, -1, :]
-            for i in range(numpy.shape(self.grid)[0]):
-                temp[i, -2, 1] = 0"""
-        elif time_step >= self.start_shoulder and time_step < self.end_shoulder and self.shoulder_open == True:
+        elif time_step >= self.start_shoulder \
+        and time_step < self.end_shoulder \
+        and self.shoulder_open == True:
             pass
         else:
             self.shoulder_open = False
