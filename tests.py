@@ -23,6 +23,9 @@ MAX_AVG_ERR = 0.1
 
 
 def car_setters_test():
+    """ Tests the cars probability related setter functions
+                
+    """
 
     auto_veh = Car()
 
@@ -152,6 +155,9 @@ def highway_setters_test():
 
 
 def car_test():
+    """ Tests the cars setters
+                
+    """
 
     car_setters_test()
 
@@ -162,6 +168,6 @@ def highway_test():
     
 if __name__ == "__main__":
 
-    #car_test()
+    car_test()
     
     highway_test()
