@@ -1,7 +1,24 @@
 # -*- coding: utf-8 -*-
-
+#=======================================================================
+#                        General Documentation
+""" Defines a Car object.
+    
+    Defines car properties, function determining when cars want to use 
+    tolls, and move functions to be utilized in Highway.py.
+    
+    Utilizes Income_Class.py, Highway.py, and Exit.py. See these class
+    files in repository for object-specific information.
 """
-
+#-----------------------------------------------------------------------
+#                       Additional Documentation
+#
+# Original by Callie Bianco and Abdullahi Diriye, UW Bothell
+#
+# Notes:
+# - Written for Python 3.7.2.
+# - Part of larger I-405 Simulation
+#=======================================================================
+"""
 Created on Wed May 22 10:08:13 2019
 
 @author: CallieBianco
@@ -45,6 +62,11 @@ class Car(object):
     
     def __init__(self, direction, near_etl_length, near_exit_length, highway, \
                  max_forward_moves):
+        """ Initializes properties of a car.
+            
+            Almost every property is initialized using a respective function 
+            because every car has varying properties.
+        """
         self.direction = direction
         self.inc_data = inc.Income_Data()
         self.on_ramp = self.init_on_ramp()
@@ -85,11 +107,13 @@ class Car(object):
         return (exit_coords[idx][0], exit_coords[idx][1])
     
     def init_on_ramp(self):
-        # Hard to find data for
-        # Educated guess of percentages based on populations
-        # Found population of each city associated with an on-ramp
-        # Divided each by the total (that percentage is the chance that
-        # a car entered from that on-ramp)
+        """ Initializes where cars enter highway.
+            
+            Hard to find data for, so the percentages are determined
+            based on city population data. Found population of each city 
+            associated with an on-ramp and ivided each by the total. That 
+            percentage is the chance that a car entered from that on-ramp.        
+        """   
         south_pops = [110079, 38273, 21337, 45533, 45533]
         total_s = np.sum(south_pops)
         chances_s = np.zeros(len(south_pops))
@@ -151,6 +175,8 @@ class Car(object):
             return self.inc_data.kirk_inc(self.income_class)
     
     def _class_breakdown(self):
+        """ Assigns every car an income class.
+        """
         low, mid_low, mid, mid_upper, upper = 0.0, 0.0, 0.0, 0.0, 0.0
         classes = ['low', 'low mid', 'mid', 'upper mid', 'upper']
         breakdown = [low, mid_low, mid, mid_upper, upper]
@@ -175,7 +201,10 @@ class Car(object):
             
         return income_class
         
-    def _city_data(self):             
+    def _city_data(self):  
+        """ Determines the city a driver comes from. An assumption
+            is made that this is where they live.
+        """
         if self.direction == 'South':
             entered = self.inc_data.on_ramps_south[self.on_ramp]
         else:
@@ -411,7 +440,8 @@ class Car(object):
     def get_max_forward(self, veh_locs_grid, grid_length):
         max_moves = 0
         idx = self.y + 1
-        while idx+1 < grid_length and veh_locs_grid[idx+1, self.x] == 0 and veh_locs_grid[idx, self.x] == 0:
+        while idx+1 < grid_length and veh_locs_grid[idx+1, self.x] == 0 \
+              and veh_locs_grid[idx, self.x] == 0:
             max_moves += 1
             idx += 1
         return max_moves
@@ -497,7 +527,8 @@ class Car(object):
         return num_moves
         
     def is_near_exit(self, arr):
-        if self.exit_coord[0] - self.y <= self.near_exit_length or self.y + 0.5 * arr.grid_per_mile >= arr.length * arr.grid_per_mile:
+        if self.exit_coord[0] - self.y <= self.near_exit_length or \
+           self.y + 0.5 * arr.grid_per_mile >= arr.length * arr.grid_per_mile:
             return True
         return False
     
@@ -522,7 +553,9 @@ class Car(object):
         on_exit = False
         if self.y + highway.grid_per_mile >= highway.length * highway.grid_per_mile:
             on_exit = True
-        if not self.on_etl and self.is_near_etl(highway) and self.want_to_move_to_ETL(highway.etl_price, timestep, highway.etl_speed, highway.gpl_speed):
+        if not self.on_etl and self.is_near_etl(highway) and \
+           self.want_to_move_to_ETL(highway.etl_price, timestep, \
+                                    highway.etl_speed, highway.gpl_speed):
             num_moves = self.move_to_etl(veh_locs_grid, lane_type_grid)
             if self.y + highway.grid_per_mile >= highway.length * highway.grid_per_mile:
                 on_exit = True
