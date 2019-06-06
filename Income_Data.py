@@ -1,8 +1,25 @@
+#=======================================================================
+#                        General Documentation
+""" Stores information related to income breakdowns between cities.
+"""
+
+#-----------------------------------------------------------------------
+#                       Additional Documentation
+#
+# Modification History:
+# - 25 May, 2019  Original by Callie Bianco, UW Bothell.
+#
+# Notes:
+# - Written for Python 3.7.2.
+# - Part of larger I-405 Simulation
+#
+#=======================================================================
 # https://datausa.io/profile/geo/everett-wa/#economy
 # https://www.pewresearch.org/fact-tank/2018/09/06/
 #       are-you-in-the-american-middle-class/
 # income and city data based on 2016 data
-""" @author CallieBianco
+"""
+    @author CallieBianco
 """
 import numpy as np
 
@@ -19,6 +36,8 @@ class Income_Data(object):
           * Any entry points south of Bothell will be ignored in on_ramps_south
     """
     def __init__(self):
+        """ Initializes properties of Income Data
+        """
       # ramp entry data will be used to determine income for a car      
         self.on_ramps_south = {'I5 North': 'Everett', 'I5 South1': 'Lynnwood', \
                                'I5 South2': 'Mountlake Terrace', 'Canyon Park':\
@@ -73,30 +92,58 @@ class Income_Data(object):
                                 'upper': [120001, 132000]}
                                           
     def ev_inc(self, iclass):
+        """ Income if a driver lives in Everett  
+            Parameters:
+                iclass: a driver's income class
+        """
         irange = self.everett_income[iclass] 
         return np.random.randint(irange[0], irange[1])
 
     def lynn_inc(self, iclass):
+        """ Income if a driver lives in Lynnwood
+            Parameters:
+                iclass: a driver's income class
+        """
         irange = self.lynnwood_income[iclass] 
         return np.random.randint(irange[0], irange[1])
 
     def mlt_inc(self, iclass):
+        """ Income if a driver lives in Mountlake Terrace
+            Parameters:
+                iclass: a driver's income class
+        """
         irange = self.mterrace_income[iclass] 
         return np.random.randint(irange[0], irange[1])
         
     def bot_inc(self, iclass):
+        """ Income if a driver lives in Bothell
+            Parameters:
+                iclass: a driver's income class
+        """
         irange = self.bothell_income[iclass] 
         return np.random.randint(irange[0], irange[1])
         
     def bell_inc(self, iclass):
+        """ Income if a driver lives in Bellevue
+            Parameters:
+                iclass: a driver's income class
+        """
         irange = self.bellevue_income[iclass] 
         return np.random.randint(irange[0], irange[1])
         
     def red_inc(self, iclass):
+        """ Income if a driver lives in Redmond
+            Parameters:
+                iclass: a driver's income class
+        """
         irange = self.redmond_income[iclass] 
         return np.random.randint(irange[0], irange[1])
         
     def kirk_inc(self, iclass):
+        """ Income if a driver lives in Kirkland
+            Parameters:
+                iclass: a driver's income class
+        """
         irange = self.kirkland_income[iclass] 
         return np.random.randint(irange[0], irange[1])
         
